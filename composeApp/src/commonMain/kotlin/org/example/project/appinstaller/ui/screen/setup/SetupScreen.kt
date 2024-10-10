@@ -1,4 +1,4 @@
-package org.example.project.appinstaller
+package org.example.project.appinstaller.ui.screen.setup
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -19,6 +18,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -35,80 +35,75 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import org.example.project.appinstaller.ui.theme.CustomTheme
-import org.jetbrains.compose.ui.tooling.preview.Preview
 
 @Composable
-@Preview
-fun App() {
-
-    MaterialTheme {
-        Column(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-            var majorVersion by remember { mutableStateOf("") }
-            var minorVersion by remember { mutableStateOf("") }
-            var microVersion by remember { mutableStateOf("") }
-            var buildVersion by remember { mutableStateOf("") }
-            DropDownRow(
-                modifier = Modifier.padding(top = 20.dp),
-                label = "Project",
-                options = listOf("Izzi", "Zapi"),
-                default = "Not set"
+fun SetupScreen() {
+    Column(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+        var majorVersion by remember { mutableStateOf("") }
+        var minorVersion by remember { mutableStateOf("") }
+        var microVersion by remember { mutableStateOf("") }
+        var buildVersion by remember { mutableStateOf("") }
+        DropDownRow(
+            modifier = Modifier.padding(top = 20.dp),
+            label = "Project",
+            options = listOf("Izzi", "Zapi"),
+            default = "Not set"
+        )
+        DropDownRow(
+            modifier = Modifier.padding(top = 20.dp),
+            label = "Target",
+            options = listOf("Handheld", "Leanback", "Operator Tier"),
+            default = "Not set"
+        )
+        Row(modifier = Modifier.padding(top = 20.dp)){
+            TextField(
+                modifier = Modifier.width(80.dp),
+                value = majorVersion,
+                onValueChange = { majorVersion = it },
+                label = { Text("Major", style = MaterialTheme.typography.labelSmall) },
+                singleLine = true
             )
-            DropDownRow(
-                modifier = Modifier.padding(top = 20.dp),
-                label = "Target",
-                options = listOf("Handheld", "Leanback", "Operator Tier"),
-                default = "Not set"
+            TextField(
+                modifier = Modifier.width(80.dp).padding(start = 10.dp),
+                value = minorVersion,
+                onValueChange = { minorVersion = it },
+                label = { Text("Minor", style = MaterialTheme.typography.labelSmall) },
+                singleLine = true
             )
-            Row(modifier = Modifier.padding(top = 20.dp)){
-                TextField(
-                    modifier = Modifier.width(80.dp),
-                    value = majorVersion,
-                    onValueChange = { majorVersion = it },
-                    label = { Text("Major", style = MaterialTheme.typography.labelSmall) },
-                    singleLine = true
-                )
-                TextField(
-                    modifier = Modifier.width(80.dp).padding(start = 10.dp),
-                    value = minorVersion,
-                    onValueChange = { minorVersion = it },
-                    label = { Text("Minor", style = MaterialTheme.typography.labelSmall) },
-                    singleLine = true
-                )
-                TextField(
-                    modifier = Modifier.width(80.dp).padding(start = 10.dp),
-                    value = microVersion,
-                    onValueChange = { microVersion = it },
-                    label = { Text("Micro", style = MaterialTheme.typography.labelSmall) },
-                    singleLine = true
-                )
-                TextField(
-                    modifier = Modifier.width(80.dp).padding(start = 10.dp),
-                    value = buildVersion,
-                    onValueChange = { buildVersion = it },
-                    label = { Text("Build", style = MaterialTheme.typography.labelSmall) },
-                    singleLine = true
-                )
-            }
-            Button(
-                modifier = Modifier.padding(top = 20.dp),
-                colors = ButtonDefaults.buttonColors(),
-                onClick = { /* Do something! */ }) {
-                Text("Download")
-            }
-            Row {
-                val apps = listOf("Launcher", "Autopair")
-                Column(modifier = Modifier.wrapContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row {
-                        Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
-                    }
-                    apps.forEach { app ->
-                        AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
-                            appName = app,
-                            color = CustomTheme.colors.error,
-                            checked = true,
-                            state = "Idle",
-                            isTransient = true)
-                    }
+            TextField(
+                modifier = Modifier.width(80.dp).padding(start = 10.dp),
+                value = microVersion,
+                onValueChange = { microVersion = it },
+                label = { Text("Micro", style = MaterialTheme.typography.labelSmall) },
+                singleLine = true
+            )
+            TextField(
+                modifier = Modifier.width(80.dp).padding(start = 10.dp),
+                value = buildVersion,
+                onValueChange = { buildVersion = it },
+                label = { Text("Build", style = MaterialTheme.typography.labelSmall) },
+                singleLine = true
+            )
+        }
+        Button(
+            modifier = Modifier.padding(top = 20.dp),
+            colors = ButtonDefaults.buttonColors(),
+            onClick = { /* Do something! */ }) {
+            Text("Download")
+        }
+        Row {
+            val apps = listOf("Launcher", "Autopair")
+            Column(modifier = Modifier.wrapContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Row {
+                    Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
+                }
+                apps.forEach { app ->
+                    AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
+                        appName = app,
+                        color = CustomTheme.colors.error,
+                        checked = true,
+                        state = "Idle",
+                        isTransient = true)
                 }
             }
         }
