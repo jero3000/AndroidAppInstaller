@@ -4,5 +4,6 @@ import org.example.project.appinstaller.model.AppConfig
 
 
 interface ConfigurationRepository {
-    suspend fun getConfiguration(): Result<AppConfig>
+    fun getConfiguration(): AppConfig?
+    suspend fun fetchConfiguration(): Result<AppConfig>
 }
