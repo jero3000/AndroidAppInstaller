@@ -27,6 +27,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.kotlinxDatetime)
             implementation(libs.kotlinxSerializationJson)
+            implementation(project.dependencies.platform(libs.koin.bom))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.composeVM)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -37,6 +41,7 @@ kotlin {
             implementation(libs.kotlin.test)
             implementation(mokkery("coroutines"))
             implementation(libs.kotlin.coroutines.test)
+            implementation(libs.koin.test)
         }
     }
 }
