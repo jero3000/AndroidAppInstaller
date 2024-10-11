@@ -33,7 +33,7 @@ class SetupViewModel(
                 }
             } ?: run {
                 _uiState.update { currentState ->
-                    currentState.copy(error = appConfigResult.exceptionOrNull()?.message)
+                    currentState.copy(error = appConfigResult.exceptionOrNull()?.stackTraceToString())
                 }
             }
         }
