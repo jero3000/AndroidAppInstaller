@@ -31,6 +31,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.composeVM)
+            implementation(libs.kotlinx.io)
+            implementation(libs.kmpFile)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

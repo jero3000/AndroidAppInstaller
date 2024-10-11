@@ -2,7 +2,7 @@ package org.example.project.appinstaller.repository.local
 
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
-import org.example.project.appinstaller.filesystem.FileSystem
+import org.example.project.appinstaller.platform.filesystem.FileSystem
 import org.example.project.appinstaller.model.AppConfig
 import org.example.project.appinstaller.repository.ConfigurationDataSource
 import org.example.project.appinstaller.repository.json.AppConfigDto

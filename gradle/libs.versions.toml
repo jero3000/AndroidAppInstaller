@@ -8,6 +8,9 @@ kotlinxDatetime = "0.6.0"
 kotlinxSerialization = "1.7.1"
 mokkeryVersion = "2.4.0"
 koin-bom = "4.0.0"
+kotlinxIo = "0.5.4"
+kmpFileVersion = "0.6.1"
+
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -24,6 +27,9 @@ koin-core = { module = "io.insert-koin:koin-core" }
 koin-compose = { module = "io.insert-koin:koin-compose"}
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel"}
 koin-test = { module = "io.insert-koin:koin-test"}
+kotlinx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kotlinxIo" }
+kmpFile = {module = "dev.zwander:kmpfile", version.ref = "kmpFileVersion"}
+
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

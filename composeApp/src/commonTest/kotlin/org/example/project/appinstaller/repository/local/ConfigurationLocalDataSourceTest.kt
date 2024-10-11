@@ -7,7 +7,7 @@ import dev.mokkery.mock
 import dev.mokkery.verify
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
-import org.example.project.appinstaller.filesystem.FileSystem
+import org.example.project.appinstaller.platform.filesystem.FileSystem
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
