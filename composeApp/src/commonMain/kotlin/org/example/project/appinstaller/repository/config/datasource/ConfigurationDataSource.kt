@@ -1,4 +1,4 @@
-package org.example.project.appinstaller.repository
+package org.example.project.appinstaller.repository.config.datasource
 
 import org.example.project.appinstaller.model.AppConfig
 

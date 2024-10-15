@@ -1,5 +1,5 @@
 package org.example.project.appinstaller.model
 
-data class AppConfig(
+data class  AppConfig(
     val projects: List<Project>
 )

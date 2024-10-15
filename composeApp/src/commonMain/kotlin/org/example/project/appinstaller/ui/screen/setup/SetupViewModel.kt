@@ -9,13 +9,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.project.appinstaller.domain.GetAppConfigUseCase
+import org.example.project.appinstaller.domain.GetPackageFileUseCase
+import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
 import org.example.project.appinstaller.model.AppConfig
+import org.example.project.appinstaller.model.BuildVariant
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
+import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
 
 class SetupViewModel(
-    private val getAppConfig : GetAppConfigUseCase
+    private val getAppConfig : GetAppConfigUseCase,
+    private val resolveUrl: ResolvePackageUrlUseCase,
+    private val getPackageFile: GetPackageFileUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
     val uiState: StateFlow<SetupState> = _uiState.stateIn(
@@ -43,6 +49,7 @@ class SetupViewModel(
         when(event){
             is SetupEvent.OnDownloadClicked -> {
                 println("Init download for version R${event.version.major}.${event.version.minor}.${event.version.micro}(${event.version.build})")
+                startDownload(event.version)
             }
             is SetupEvent.OnProjectSelected -> {
                 selectProject(event.selected)
@@ -52,6 +59,33 @@ class SetupViewModel(
             }
             is SetupEvent.OnTargetSelected -> {
                 selectTarget(event.selected)
+            }
+        }
+    }
+
+    private fun startDownload(version: SetupVersion) = viewModelScope.launch{
+        val variant = getBuildVariant()
+        val placeHolders = mutableMapOf(
+            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major,
+            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to version.minor,
+            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to version.micro
+        )
+        version.build?.let { build ->
+            placeHolders.put(ResolvePackageUrlUseCase.BUILD_PLACEHOLDER, build)
+        }
+        _uiState.value.packages.filter { it.selected }.forEach{ app ->
+            val appPackage = variant.packages.first{it.packageName == app.packageName}
+            val url = resolveUrl(variant, appPackage, placeHolders)
+            updatePackage(app.packageName, SetupPackage.State.Downloading)
+            val result = getPackageFile(url)
+            if(result.isSuccess){
+                appPackage.packageFile = result.getOrNull()
+                updatePackage(app.packageName, SetupPackage.State.Downloaded)
+            } else {
+                updatePackage(app.packageName, SetupPackage.State.Error)
+                _uiState.update { currentState ->
+                    currentState.copy(error = result.exceptionOrNull()?.stackTraceToString())
+                }
             }
         }
     }
@@ -93,5 +127,23 @@ class SetupViewModel(
                 }
             })
         }
+    }
+
+    private fun updatePackage(packageName: String, state: SetupPackage.State){
+        _uiState.update { currentState ->
+            currentState.copy(packages = currentState.packages.map {
+                if(it.packageName == packageName){
+                    it.copy(state = state)
+                } else {
+                    it
+                }
+            })
+        }
+    }
+
+    private suspend fun getBuildVariant(): BuildVariant {
+        val appConfig = getAppConfig().getOrNull()!!
+        val project = appConfig.projects.first{ it.name == _uiState.value.selectedProject}
+        return project.buildVariants.first { it.name ==  _uiState.value.selectedTarget }
     }
 }

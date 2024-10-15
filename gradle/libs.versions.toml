@@ -10,7 +10,7 @@ mokkeryVersion = "2.4.0"
 koin-bom = "4.0.0"
 kotlinxIo = "0.5.4"
 kmpFileVersion = "0.6.1"
-
+commons-net = "3.11.1"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -28,8 +28,8 @@ koin-compose = { module = "io.insert-koin:koin-compose"}
 koin-composeVM = { module = "io.insert-koin:koin-compose-viewmodel"}
 koin-test = { module = "io.insert-koin:koin-test"}
 kotlinx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kotlinxIo" }
-kmpFile = {module = "dev.zwander:kmpfile", version.ref = "kmpFileVersion"}
-
+kmpFile = { module = "dev.zwander:kmpfile", version.ref = "kmpFileVersion"}
+commons-net = { module = "commons-net:commons-net", version.ref = "commons-net" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

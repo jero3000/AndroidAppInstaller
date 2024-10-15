@@ -1,4 +1,4 @@
-package org.example.project.appinstaller.repository.json
+package org.example.project.appinstaller.repository.config.json
 
 import kotlinx.serialization.Serializable
 

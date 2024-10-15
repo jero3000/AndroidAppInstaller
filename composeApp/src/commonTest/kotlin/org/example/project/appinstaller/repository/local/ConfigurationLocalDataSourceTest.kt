@@ -8,6 +8,7 @@ import dev.mokkery.verify
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.example.project.appinstaller.platform.filesystem.FileSystem
+import org.example.project.appinstaller.repository.config.datasource.ConfigurationLocalDataSource
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

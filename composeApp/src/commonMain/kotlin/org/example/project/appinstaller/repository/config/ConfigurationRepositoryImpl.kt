@@ -1,8 +1,10 @@
-package org.example.project.appinstaller.repository
+package org.example.project.appinstaller.repository.config
 
 import org.example.project.appinstaller.model.AppConfig
+import org.example.project.appinstaller.repository.config.datasource.ConfigurationDataSource
 
-class ConfigurationRepositoryImpl(private val dataSource: ConfigurationDataSource) : ConfigurationRepository {
+class ConfigurationRepositoryImpl(private val dataSource: ConfigurationDataSource) :
+    ConfigurationRepository {
 
     private var appConfig: AppConfig? = null
 

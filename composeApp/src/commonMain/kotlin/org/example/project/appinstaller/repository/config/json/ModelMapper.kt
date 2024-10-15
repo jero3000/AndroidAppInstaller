@@ -1,4 +1,4 @@
-package org.example.project.appinstaller.repository.json
+package org.example.project.appinstaller.repository.config.json
 
 import org.example.project.appinstaller.model.AppConfig
 import org.example.project.appinstaller.model.AppPackage

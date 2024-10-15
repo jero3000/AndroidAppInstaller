@@ -32,6 +32,10 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
         lifecycleOwner = LocalLifecycleOwner.current
     )
 
+    if(uiState.error != null) {
+        println("error: ${uiState.error}")
+    }
+
     Column(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         DropDownRow(
             modifier = Modifier.padding(top = 20.dp),
@@ -69,7 +73,7 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
                 uiState.packages.forEach { appPackage ->
                     AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
                         appName = appPackage.name,
-                        color = CustomTheme.colors.error,
+                        color = getAppColor(appPackage.state),
                         checked = appPackage.selected,
                         state = getAppState(appPackage.state),
                         isTransient = isTransientState(appPackage.state),
@@ -83,12 +87,23 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
     }
 }
 
+@Composable
+fun getAppColor(state: SetupPackage.State) = when(state){
+    SetupPackage.State.Idle -> CustomTheme.colors.idle
+    SetupPackage.State.Downloading -> CustomTheme.colors.warning
+    SetupPackage.State.Downloaded -> CustomTheme.colors.success
+    SetupPackage.State.Installing -> CustomTheme.colors.warning
+    SetupPackage.State.Installed -> CustomTheme.colors.success
+    SetupPackage.State.Error -> CustomTheme.colors.error
+}
+
 fun getAppState(state: SetupPackage.State) = when(state){
     SetupPackage.State.Idle -> "Idle"
     SetupPackage.State.Downloading -> "Downloading..."
     SetupPackage.State.Downloaded -> "Downloaded"
     SetupPackage.State.Installing -> "Installing..."
     SetupPackage.State.Installed -> "Installed"
+    SetupPackage.State.Error -> "Error"
 }
 
 fun isTransientState(state: SetupPackage.State) = when(state){
@@ -97,4 +112,5 @@ fun isTransientState(state: SetupPackage.State) = when(state){
     SetupPackage.State.Downloaded -> false
     SetupPackage.State.Installing -> true
     SetupPackage.State.Installed -> false
+    SetupPackage.State.Error -> false
 }

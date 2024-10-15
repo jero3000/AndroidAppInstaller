@@ -11,7 +11,8 @@ data class SetupPackage(
         Downloading,
         Downloaded,
         Installing,
-        Installed
+        Installed,
+        Error
     }
 }
 
