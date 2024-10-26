@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import org.example.project.appinstaller.domain.GetAppConfigUseCase
 import org.example.project.appinstaller.domain.GetPackageFileUseCase
 import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
-import org.example.project.appinstaller.model.AppConfig
 import org.example.project.appinstaller.model.BuildVariant
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
@@ -38,8 +37,10 @@ class SetupViewModel(
                     SetupState(appConfig.projects.map { it.name })
                 }
             } ?: run {
-                _uiState.update { currentState ->
-                    currentState.copy(error = appConfigResult.exceptionOrNull()?.stackTraceToString())
+                appConfigResult.exceptionOrNull()?.stackTraceToString()?.let { error ->
+                    _uiState.update { currentState ->
+                        currentState.copy(error = SetupState.Error.GenericError(error))
+                    }
                 }
             }
         }
@@ -59,6 +60,9 @@ class SetupViewModel(
             }
             is SetupEvent.OnTargetSelected -> {
                 selectTarget(event.selected)
+            }
+            is SetupEvent.OnErrorAck -> {
+                _uiState.update { it.copy(error = null) }
             }
         }
     }
@@ -83,8 +87,10 @@ class SetupViewModel(
                 updatePackage(app.packageName, SetupPackage.State.Downloaded)
             } else {
                 updatePackage(app.packageName, SetupPackage.State.Error)
-                _uiState.update { currentState ->
-                    currentState.copy(error = result.exceptionOrNull()?.stackTraceToString())
+                result.exceptionOrNull()?.stackTraceToString()?.let { error ->
+                    _uiState.update { currentState ->
+                        currentState.copy(error = SetupState.Error.GenericError(error))
+                    }
                 }
             }
         }

@@ -5,4 +5,5 @@ sealed class SetupEvent{
     data class OnTargetSelected(val selected: String): SetupEvent()
     data class OnSetupPackageChanged(val packageName: String, val checked: Boolean): SetupEvent()
     data class OnDownloadClicked(val version: SetupVersion): SetupEvent()
+    data object OnErrorAck: SetupEvent()
 }

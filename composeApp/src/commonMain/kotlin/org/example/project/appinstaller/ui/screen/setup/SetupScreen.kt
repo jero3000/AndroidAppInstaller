@@ -17,11 +17,14 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.example.project.appinstaller.ui.component.AppRow
+import org.example.project.appinstaller.ui.component.CredentialsDialog
+import org.example.project.appinstaller.ui.component.CustomAlertDialog
 import org.example.project.appinstaller.ui.component.DropDownRow
 import org.example.project.appinstaller.ui.component.VersionRow
 import org.example.project.appinstaller.ui.component.rememberVersionState
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
+import org.example.project.appinstaller.ui.screen.setup.model.SetupState
 import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
 import org.example.project.appinstaller.ui.theme.CustomTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -31,10 +34,6 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle(
         lifecycleOwner = LocalLifecycleOwner.current
     )
-
-    if(uiState.error != null) {
-        println("error: ${uiState.error}")
-    }
 
     Column(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
         DropDownRow(
@@ -81,6 +80,21 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
                             viewModel.onEvent(SetupEvent.OnSetupPackageChanged(appPackage.packageName, checked))
                         }
                     )
+                }
+            }
+        }
+    }
+
+    uiState.error?.let {
+        when(it){
+            is SetupState.Error.CredentialsRequired -> {
+                CredentialsDialog(host = it.host,
+                    onConfirmation = { _,_ -> viewModel.onEvent(SetupEvent.OnErrorAck)},
+                    onCancel = {viewModel.onEvent(SetupEvent.OnErrorAck)})
+            }
+            is SetupState.Error.GenericError -> {
+                CustomAlertDialog(it.description.take(170)+"..."){
+                    viewModel.onEvent(SetupEvent.OnErrorAck)
                 }
             }
         }

@@ -33,6 +33,7 @@ kotlin {
             implementation(libs.koin.composeVM)
             implementation(libs.kotlinx.io)
             implementation(libs.kmpFile)
+            implementation(compose.materialIconsExtended)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

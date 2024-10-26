@@ -6,5 +6,10 @@ data class SetupState(
     val targets : List<String> = emptyList(),
     val selectedTarget: String? = null,
     val packages : List<SetupPackage> = emptyList(),
-    val error: String? = null
-)
+    val error: Error? = null
+){
+    sealed interface Error{
+        data class GenericError(val description: String): Error
+        data class CredentialsRequired(val host: String): Error
+    }
+}
