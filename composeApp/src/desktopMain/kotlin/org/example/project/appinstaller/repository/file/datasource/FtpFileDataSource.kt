@@ -3,12 +3,12 @@ package org.example.project.appinstaller.repository.file.datasource
 import dev.zwander.kotlin.file.FileUtils
 import dev.zwander.kotlin.file.IPlatformFile
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.io.IOException
 import kotlinx.io.files.Path
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
+import org.example.project.appinstaller.model.exception.CredentialsRequiredException
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -34,7 +34,11 @@ actual class FtpFileDataSource(): FileDataSource {
             try {
                 ftp = FTPClient()
                 ftp.connect(server, port)
-
+                //Try anonymous login first
+                val login = ftp.login("anonymous", "")
+                if(!login){
+                    throw CredentialsRequiredException(server)
+                }
                 ftp.setFileType(FTP.BINARY_FILE_TYPE)
                 ftp.enterLocalPassiveMode()
 
