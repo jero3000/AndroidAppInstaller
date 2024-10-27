@@ -47,6 +47,10 @@ actual class FtpFileDataSource(): FileDataSource {
                     val fileUri = Paths.get(targetFilePath).toUri().toString()
                     FileUtils.fromString(fileUri, false) ?: throw IOException("Unable to create the target file")
                 } else throw IOException("Unable to download the file from FTP server")
+            } catch(t:Throwable){
+                //Remove the file if it was not properly downloaded
+                File(targetFilePath).takeIf { it.exists() }?.delete()
+                throw t
             } finally {
                 if (ftp != null) {
                     ftp.logout()
