@@ -93,6 +93,7 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
                     onCancel = {viewModel.onEvent(SetupEvent.OnErrorAck)})
             }
             is SetupState.Error.GenericError -> {
+                println(it.description)
                 CustomAlertDialog(it.description.take(170)+"..."){
                     viewModel.onEvent(SetupEvent.OnErrorAck)
                 }

@@ -12,6 +12,7 @@ import org.example.project.appinstaller.domain.GetAppConfigUseCase
 import org.example.project.appinstaller.domain.GetPackageFileUseCase
 import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
 import org.example.project.appinstaller.model.BuildVariant
+import org.example.project.appinstaller.model.exception.CredentialsRequiredException
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
@@ -87,11 +88,21 @@ class SetupViewModel(
                 updatePackage(app.packageName, SetupPackage.State.Downloaded)
             } else {
                 updatePackage(app.packageName, SetupPackage.State.Error)
-                result.exceptionOrNull()?.stackTraceToString()?.let { error ->
-                    _uiState.update { currentState ->
-                        currentState.copy(error = SetupState.Error.GenericError(error))
-                    }
+                result.exceptionOrNull()?.let {
+                    processDownloadException(it)
                 }
+            }
+        }
+    }
+
+    private fun processDownloadException(exception: Throwable){
+        if(exception is CredentialsRequiredException){
+            _uiState.update { currentState ->
+                currentState.copy(error = SetupState.Error.CredentialsRequired(exception.host))
+            }
+        } else {
+            _uiState.update { currentState ->
+                currentState.copy(error = SetupState.Error.GenericError(exception.stackTraceToString()))
             }
         }
     }
