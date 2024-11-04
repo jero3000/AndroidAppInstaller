@@ -8,6 +8,7 @@ import kotlinx.io.IOException
 import kotlinx.io.files.Path
 import org.apache.commons.net.ftp.FTP
 import org.apache.commons.net.ftp.FTPClient
+import org.example.project.appinstaller.model.Credential
 import org.example.project.appinstaller.model.exception.CredentialsRequiredException
 import java.io.BufferedOutputStream
 import java.io.File
@@ -20,7 +21,7 @@ actual class FtpFileDataSource(): FileDataSource {
     override fun supports(url: String) = URI(url).scheme == "ftp"
 
 
-    override suspend fun getFile(url: String, targetPath: String): Result<IPlatformFile> = withContext(Dispatchers.IO){
+    override suspend fun getFile(url: String, targetPath: String, credential: Credential?): Result<IPlatformFile> = withContext(Dispatchers.IO){
         kotlin.runCatching {
             var ftp: FTPClient? = null
             val uri = URI(url)
@@ -34,8 +35,13 @@ actual class FtpFileDataSource(): FileDataSource {
             try {
                 ftp = FTPClient()
                 ftp.connect(server, port)
-                //Try anonymous login first
-                val login = ftp.login("anonymous", "")
+                val login = if(credential != null){
+                    //Try with credentials if present
+                    ftp.login(credential.user, credential.password)
+                } else {
+                    //Try anonymous login as fallback
+                    ftp.login("anonymous", "")
+                }
                 if(!login){
                     throw CredentialsRequiredException(server)
                 }

@@ -35,6 +35,7 @@ kotlin {
             implementation(libs.kmpFile)
             implementation(compose.materialIconsExtended)
             implementation(libs.multiplatform.settings)
+            implementation(libs.ktor.core)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)

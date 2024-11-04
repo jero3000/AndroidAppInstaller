@@ -12,6 +12,7 @@ kotlinxIo = "0.5.4"
 kmpFileVersion = "0.6.1"
 commons-net = "3.11.1"
 multiplatformSettings = "1.2.0"
+ktor = "3.0.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -32,6 +33,7 @@ kotlinx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", versio
 kmpFile = { module = "dev.zwander:kmpfile", version.ref = "kmpFileVersion"}
 commons-net = { module = "commons-net:commons-net", version.ref = "commons-net" }
 multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
+ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

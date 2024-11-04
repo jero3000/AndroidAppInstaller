@@ -37,7 +37,7 @@ val repositoryModule = module {
     } withOptions {
         named("resolver")
     }
-    single<FileRepository> { FileRepositoryImpl(get<FileDataSource>(named("resolver")), get(), get()) }
+    single<FileRepository> { FileRepositoryImpl(get<FileDataSource>(named("resolver")), get(), get(), get()) }
 
     factory<CredentialDataSource> { CredentialPreferencesDataSource(get(), Dispatchers.IO) }
     single<CredentialRepository> { CredentialRepositoryImpl(get()) }
