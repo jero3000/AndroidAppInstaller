@@ -11,6 +11,7 @@ koin-bom = "4.0.0"
 kotlinxIo = "0.5.4"
 kmpFileVersion = "0.6.1"
 commons-net = "3.11.1"
+multiplatformSettings = "1.2.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -30,6 +31,7 @@ koin-test = { module = "io.insert-koin:koin-test"}
 kotlinx-io = { group = "org.jetbrains.kotlinx", name = "kotlinx-io-core", version.ref = "kotlinxIo" }
 kmpFile = { module = "dev.zwander:kmpfile", version.ref = "kmpFileVersion"}
 commons-net = { module = "commons-net:commons-net", version.ref = "commons-net" }
+multiplatform-settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatformSettings" }
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

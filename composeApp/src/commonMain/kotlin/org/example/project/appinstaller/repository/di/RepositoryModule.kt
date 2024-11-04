@@ -6,6 +6,10 @@ import org.example.project.appinstaller.repository.config.datasource.Configurati
 import org.example.project.appinstaller.repository.config.ConfigurationRepository
 import org.example.project.appinstaller.repository.config.datasource.ConfigurationLocalDataSource
 import org.example.project.appinstaller.repository.config.ConfigurationRepositoryImpl
+import org.example.project.appinstaller.repository.credential.CredentialRepository
+import org.example.project.appinstaller.repository.credential.CredentialRepositoryImpl
+import org.example.project.appinstaller.repository.credential.datasource.CredentialDataSource
+import org.example.project.appinstaller.repository.credential.datasource.CredentialPreferencesDataSource
 import org.example.project.appinstaller.repository.file.FileRepository
 import org.example.project.appinstaller.repository.file.FileRepositoryImpl
 import org.example.project.appinstaller.repository.file.datasource.FileDataSource
@@ -34,6 +38,9 @@ val repositoryModule = module {
         named("resolver")
     }
     single<FileRepository> { FileRepositoryImpl(get<FileDataSource>(named("resolver")), get(), get()) }
+
+    factory<CredentialDataSource> { CredentialPreferencesDataSource(get(), Dispatchers.IO) }
+    single<CredentialRepository> { CredentialRepositoryImpl(get()) }
 }
 
 expect val systemDataSourceModule: Module

@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import org.example.project.appinstaller.domain.GetAppConfigUseCase
 import org.example.project.appinstaller.domain.GetPackageFileUseCase
 import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
+import org.example.project.appinstaller.domain.StoreCredentialsUseCase
 import org.example.project.appinstaller.model.BuildVariant
 import org.example.project.appinstaller.model.exception.CredentialsRequiredException
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
@@ -21,7 +22,8 @@ import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
 class SetupViewModel(
     private val getAppConfig : GetAppConfigUseCase,
     private val resolveUrl: ResolvePackageUrlUseCase,
-    private val getPackageFile: GetPackageFileUseCase
+    private val getPackageFile: GetPackageFileUseCase,
+    private val storeCredential: StoreCredentialsUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
     val uiState: StateFlow<SetupState> = _uiState.stateIn(
@@ -64,6 +66,10 @@ class SetupViewModel(
             }
             is SetupEvent.OnErrorAck -> {
                 _uiState.update { it.copy(error = null) }
+            }
+
+            is SetupEvent.OnNewCredential -> viewModelScope.launch{
+                storeCredential(event.host, event.credential)
             }
         }
     }

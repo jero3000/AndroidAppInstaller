@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import org.example.project.appinstaller.model.Credential
 import org.example.project.appinstaller.ui.component.AppRow
 import org.example.project.appinstaller.ui.component.CredentialsDialog
 import org.example.project.appinstaller.ui.component.CustomAlertDialog
@@ -89,7 +90,10 @@ fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
         when(it){
             is SetupState.Error.CredentialsRequired -> {
                 CredentialsDialog(host = it.host,
-                    onConfirmation = { _,_ -> viewModel.onEvent(SetupEvent.OnErrorAck)},
+                    onConfirmation = { user, pass ->
+                        viewModel.onEvent(SetupEvent.OnErrorAck)
+                        viewModel.onEvent(SetupEvent.OnNewCredential(it.host, Credential(user, pass)))
+                    },
                     onCancel = {viewModel.onEvent(SetupEvent.OnErrorAck)})
             }
             is SetupState.Error.GenericError -> {

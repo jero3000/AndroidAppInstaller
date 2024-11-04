@@ -34,11 +34,13 @@ kotlin {
             implementation(libs.kotlinx.io)
             implementation(libs.kmpFile)
             implementation(compose.materialIconsExtended)
+            implementation(libs.multiplatform.settings)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.commons.net)
+            implementation(libs.multiplatform.settings)
         }
 
         commonTest.dependencies {
