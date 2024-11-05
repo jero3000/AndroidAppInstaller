@@ -36,12 +36,14 @@ kotlin {
             implementation(compose.materialIconsExtended)
             implementation(libs.multiplatform.settings)
             implementation(libs.ktor.core)
+            implementation(libs.cryptography.core)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.commons.net)
             implementation(libs.multiplatform.settings)
+            implementation(libs.cryptography.provider.jdk)
         }
 
         commonTest.dependencies {
