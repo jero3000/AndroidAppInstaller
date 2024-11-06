@@ -10,4 +10,8 @@ class CredentialRepositoryImpl(private val dataSource: CredentialDataSource): Cr
     override suspend fun putCredential(host: String, credential: Credential) {
         dataSource.putCredential(host, credential)
     }
+
+    override suspend fun deleteCredential(host: String) {
+        dataSource.deleteCredential(host)
+    }
 }

@@ -31,6 +31,10 @@ class CredentialPreferencesDataSource(settingsFactory: Settings.Factory, private
         }
     }
 
+    override suspend fun deleteCredential(host: String) = withContext(ioContext) {
+        settings.remove(host)
+    }
+
     private suspend fun encrypt(data: String): String{
         // getting default provider
         val provider = CryptographyProvider.Default

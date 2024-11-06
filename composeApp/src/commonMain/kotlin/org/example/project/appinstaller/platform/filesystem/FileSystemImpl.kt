@@ -1,10 +1,10 @@
 package org.example.project.appinstaller.platform.filesystem
 
-import dev.zwander.kotlin.file.FileUtils
 import kotlinx.io.IOException
 import kotlinx.io.readString
 
-class FileSystemImpl(private val platformFileSystem: PlatformFileSystem) : FileSystem {
+class FileSystemImpl(private val platformFileSystem: PlatformFileSystem,
+                     private val fileUtils: FileUtils) : FileSystem {
 
     override fun readConfiguration(fileName: String): Result<String> {
         val userHome = platformFileSystem.getUserDirectory()
@@ -17,7 +17,7 @@ class FileSystemImpl(private val platformFileSystem: PlatformFileSystem) : FileS
     private fun readText(path: String): Result<String> {
         return kotlin.runCatching {
             val uri = platformFileSystem.getUri(path)
-            val file = FileUtils.fromString(uri, false) ?: throw IOException("File $path not found!")
+            val file = fileUtils.getFileFromPath(uri, false) ?: throw IOException("File $path not found!")
             file.openInputStream()?.readString() ?: throw IOException("File $path cannot be opened!")
         }
     }
