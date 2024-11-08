@@ -14,4 +14,8 @@ class CredentialRepositoryImpl(private val dataSource: CredentialDataSource): Cr
     override suspend fun deleteCredential(host: String) {
         dataSource.deleteCredential(host)
     }
+
+    override suspend fun clear() {
+        dataSource.clear()
+    }
 }
