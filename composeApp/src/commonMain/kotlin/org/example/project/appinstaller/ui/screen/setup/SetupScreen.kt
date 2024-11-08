@@ -59,6 +59,10 @@ class SetupScreen: Screen {
             ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
 
             val versionState = rememberVersionState()
+            versionState.major = uiState.selectedVersion?.major ?: ""
+            versionState.minor = uiState.selectedVersion?.minor ?: ""
+            versionState.micro = uiState.selectedVersion?.micro ?: ""
+            versionState.build = uiState.selectedVersion?.build ?: ""
             VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
 
             Button(

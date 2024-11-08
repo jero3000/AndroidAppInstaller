@@ -53,7 +53,11 @@ class SetupViewModel(
         when(event){
             is SetupEvent.OnDownloadClicked -> {
                 println("Init download for version R${event.version.major}.${event.version.minor}.${event.version.micro}(${event.version.build})")
-                startDownload(event.version)
+                _uiState.update { it.copy(selectedVersion = event.version) }
+
+                viewModelScope.launch {
+                    startDownload(event.version)
+                }
             }
             is SetupEvent.OnProjectSelected -> {
                 selectProject(event.selected)
@@ -70,11 +74,14 @@ class SetupViewModel(
 
             is SetupEvent.OnNewCredential -> viewModelScope.launch{
                 storeCredential(event.host, event.credential)
+                _uiState.value.selectedVersion?.let {
+                    startDownload(it)
+                }
             }
         }
     }
 
-    private fun startDownload(version: SetupVersion) = viewModelScope.launch{
+    private suspend fun startDownload(version: SetupVersion) {
         val variant = getBuildVariant()
         val placeHolders = mutableMapOf(
             ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major,
@@ -84,6 +91,7 @@ class SetupViewModel(
         version.build?.let { build ->
             placeHolders.put(ResolvePackageUrlUseCase.BUILD_PLACEHOLDER, build)
         }
+
         _uiState.value.packages.filter { it.selected }.forEach{ app ->
             val appPackage = variant.packages.first{it.packageName == app.packageName}
             val url = resolveUrl(variant, appPackage, placeHolders)
