@@ -63,8 +63,10 @@ actual class FtpFileDataSource(): FileDataSource {
                 throw t
             } finally {
                 if (ftp != null) {
-                    ftp.logout()
-                    ftp.disconnect()
+                    runCatching {
+                        ftp.logout()
+                        ftp.disconnect()
+                    }
                 }
             }
         }
