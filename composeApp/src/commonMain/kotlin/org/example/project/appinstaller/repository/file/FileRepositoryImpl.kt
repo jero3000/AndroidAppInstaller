@@ -32,7 +32,7 @@ class FileRepositoryImpl(private val dataSource: FileDataSource,
         return fileUtils.getFileFromPath(platformFileSystem.getUri(dirPath), true)?.let { dir ->
             val exists = if(!dir.getExists()){
                 dir.mkdir()
-            } else false
+            } else true
 
             if(exists){
                 val credential = credentialRepository.getCredential(Url(url).host)
