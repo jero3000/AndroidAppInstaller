@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.screen.Screen
 import org.example.project.appinstaller.model.Credential
 import org.example.project.appinstaller.ui.component.AppRow
 import org.example.project.appinstaller.ui.component.CredentialsDialog
@@ -30,106 +31,133 @@ import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
 import org.example.project.appinstaller.ui.theme.CustomTheme
 import org.koin.compose.viewmodel.koinViewModel
 
-@Composable
-fun SetupScreen(viewModel : SetupViewModel = koinViewModel<SetupViewModel>()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle(
-        lifecycleOwner = LocalLifecycleOwner.current
-    )
+class SetupScreen: Screen {
 
-    Column(modifier = Modifier.padding(20.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-        DropDownRow(
-            modifier = Modifier.padding(top = 20.dp),
-            label = "Project",
-            options = uiState.projects,
-            default = uiState.selectedProject ?: "Not set"
-        ){ viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
-        DropDownRow(
-            modifier = Modifier.padding(top = 20.dp),
-            label = "Target",
-            options = uiState.targets,
-            default = uiState.selectedTarget ?: "Not set"
-        ){ viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+    @Composable
+    override fun Content() {
+        val viewModel = koinViewModel<SetupViewModel>()
 
-        val versionState = rememberVersionState()
-        VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle(
+            lifecycleOwner = LocalLifecycleOwner.current
+        )
 
-        Button(
-            modifier = Modifier.padding(top = 20.dp),
-            colors = ButtonDefaults.buttonColors(),
-            onClick = {
-                viewModel.onEvent(SetupEvent.OnDownloadClicked(SetupVersion(
-                            versionState.major,
-                            versionState.minor,
-                            versionState.micro,
-                            versionState.build)))
-            }) {
-            Text("Download")
-        }
-        Row {
-            Column(modifier = Modifier.wrapContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Row {
-                    Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
-                }
-                uiState.packages.forEach { appPackage ->
-                    AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
-                        appName = appPackage.name,
-                        color = getAppColor(appPackage.state),
-                        checked = appPackage.selected,
-                        state = getAppState(appPackage.state),
-                        isTransient = isTransientState(appPackage.state),
-                        onCheckedChanged = { checked ->
-                            viewModel.onEvent(SetupEvent.OnSetupPackageChanged(appPackage.packageName, checked))
-                        }
+        Column(
+            modifier = Modifier.padding(20.dp).fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            DropDownRow(
+                modifier = Modifier.padding(top = 20.dp),
+                label = "Project",
+                options = uiState.projects,
+                default = uiState.selectedProject ?: "Not set"
+            ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
+            DropDownRow(
+                modifier = Modifier.padding(top = 20.dp),
+                label = "Target",
+                options = uiState.targets,
+                default = uiState.selectedTarget ?: "Not set"
+            ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+
+            val versionState = rememberVersionState()
+            VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
+
+            Button(
+                modifier = Modifier.padding(top = 20.dp),
+                colors = ButtonDefaults.buttonColors(),
+                onClick = {
+                    viewModel.onEvent(
+                        SetupEvent.OnDownloadClicked(
+                            SetupVersion(
+                                versionState.major,
+                                versionState.minor,
+                                versionState.micro,
+                                versionState.build
+                            )
+                        )
                     )
+                }) {
+                Text("Download")
+            }
+            Row {
+                Column(
+                    modifier = Modifier.wrapContentSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row {
+                        Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
+                    }
+                    uiState.packages.forEach { appPackage ->
+                        AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
+                            appName = appPackage.name,
+                            color = getAppColor(appPackage.state),
+                            checked = appPackage.selected,
+                            state = getAppState(appPackage.state),
+                            isTransient = isTransientState(appPackage.state),
+                            onCheckedChanged = { checked ->
+                                viewModel.onEvent(
+                                    SetupEvent.OnSetupPackageChanged(
+                                        appPackage.packageName,
+                                        checked
+                                    )
+                                )
+                            }
+                        )
+                    }
                 }
             }
         }
-    }
 
-    uiState.error?.let {
-        when(it){
-            is SetupState.Error.CredentialsRequired -> {
-                CredentialsDialog(host = it.host,
-                    onConfirmation = { user, pass ->
+        uiState.error?.let {
+            when (it) {
+                is SetupState.Error.CredentialsRequired -> {
+                    CredentialsDialog(host = it.host,
+                        onConfirmation = { user, pass ->
+                            viewModel.onEvent(SetupEvent.OnErrorAck)
+                            viewModel.onEvent(
+                                SetupEvent.OnNewCredential(
+                                    it.host,
+                                    Credential(user, pass)
+                                )
+                            )
+                        },
+                        onCancel = { viewModel.onEvent(SetupEvent.OnErrorAck) })
+                }
+
+                is SetupState.Error.GenericError -> {
+                    println(it.description)
+                    CustomAlertDialog(it.description.take(170) + "...") {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
-                        viewModel.onEvent(SetupEvent.OnNewCredential(it.host, Credential(user, pass)))
-                    },
-                    onCancel = {viewModel.onEvent(SetupEvent.OnErrorAck)})
-            }
-            is SetupState.Error.GenericError -> {
-                println(it.description)
-                CustomAlertDialog(it.description.take(170)+"..."){
-                    viewModel.onEvent(SetupEvent.OnErrorAck)
+                    }
                 }
             }
         }
     }
-}
 
-@Composable
-fun getAppColor(state: SetupPackage.State) = when(state){
-    SetupPackage.State.Idle -> CustomTheme.colors.idle
-    SetupPackage.State.Downloading -> CustomTheme.colors.warning
-    SetupPackage.State.Downloaded -> CustomTheme.colors.success
-    SetupPackage.State.Installing -> CustomTheme.colors.warning
-    SetupPackage.State.Installed -> CustomTheme.colors.success
-    SetupPackage.State.Error -> CustomTheme.colors.error
-}
+    @Composable
+    private fun getAppColor(state: SetupPackage.State) = when (state) {
+        SetupPackage.State.Idle -> CustomTheme.colors.idle
+        SetupPackage.State.Downloading -> CustomTheme.colors.warning
+        SetupPackage.State.Downloaded -> CustomTheme.colors.success
+        SetupPackage.State.Installing -> CustomTheme.colors.warning
+        SetupPackage.State.Installed -> CustomTheme.colors.success
+        SetupPackage.State.Error -> CustomTheme.colors.error
+    }
 
-fun getAppState(state: SetupPackage.State) = when(state){
-    SetupPackage.State.Idle -> "Idle"
-    SetupPackage.State.Downloading -> "Downloading..."
-    SetupPackage.State.Downloaded -> "Downloaded"
-    SetupPackage.State.Installing -> "Installing..."
-    SetupPackage.State.Installed -> "Installed"
-    SetupPackage.State.Error -> "Error"
-}
+    private fun getAppState(state: SetupPackage.State) = when (state) {
+        SetupPackage.State.Idle -> "Idle"
+        SetupPackage.State.Downloading -> "Downloading..."
+        SetupPackage.State.Downloaded -> "Downloaded"
+        SetupPackage.State.Installing -> "Installing..."
+        SetupPackage.State.Installed -> "Installed"
+        SetupPackage.State.Error -> "Error"
+    }
 
-fun isTransientState(state: SetupPackage.State) = when(state){
-    SetupPackage.State.Idle -> false
-    SetupPackage.State.Downloading -> true
-    SetupPackage.State.Downloaded -> false
-    SetupPackage.State.Installing -> true
-    SetupPackage.State.Installed -> false
-    SetupPackage.State.Error -> false
+    private fun isTransientState(state: SetupPackage.State) = when (state) {
+        SetupPackage.State.Idle -> false
+        SetupPackage.State.Downloading -> true
+        SetupPackage.State.Downloaded -> false
+        SetupPackage.State.Installing -> true
+        SetupPackage.State.Installed -> false
+        SetupPackage.State.Error -> false
+    }
 }

@@ -37,6 +37,10 @@ kotlin {
             implementation(libs.multiplatform.settings)
             implementation(libs.ktor.core)
             implementation(libs.cryptography.core)
+            implementation(libs.voyager.navigator)
+            implementation(libs.voyager.screenModel)
+            implementation(libs.voyager.koin)
+            implementation(libs.voyager.lifecycle.kmp)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
