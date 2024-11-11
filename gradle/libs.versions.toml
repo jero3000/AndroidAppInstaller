@@ -15,6 +15,7 @@ multiplatformSettings = "1.2.0"
 ktor = "3.0.0"
 cryptography = "0.4.0"
 voyager = "1.1.0-beta02"
+filekit = "0.8.7"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -42,7 +43,9 @@ voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.
 voyager-screenModel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 voyager-lifecycle-kmp = { module = "cafe.adriel.voyager:voyager-lifecycle-kmp", version.ref = "voyager" }
-
+filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref="filekit" }
+filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref="filekit" }
+kmpFile-filekit = { module = "dev.zwander:kmpfile-filekit", version.ref = "kmpFileVersion"}
 appdirs = { module = "net.harawata:appdirs", version = "1.2.2" }
 
 [plugins]

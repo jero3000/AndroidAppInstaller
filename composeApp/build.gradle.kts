@@ -41,6 +41,9 @@ kotlin {
             implementation(libs.voyager.screenModel)
             implementation(libs.voyager.koin)
             implementation(libs.voyager.lifecycle.kmp)
+            implementation(libs.filekit.core)
+            implementation(libs.filekit.compose)
+            implementation(libs.kmpFile.filekit)
         }
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
@@ -66,6 +69,9 @@ compose.desktop {
         mainClass = "org.example.project.appinstaller.MainKt"
 
         nativeDistributions {
+            linux {
+                modules("jdk.security.auth")
+            }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.example.project.appinstaller"
             packageVersion = "1.0.0"
