@@ -22,14 +22,14 @@ class FileRepositoryImpl(private val dataSource: FileDataSource,
         val fileSeparator = platformFileSystem.getFileSeparator()
         val filePath = tmpDir.takeIf { it.endsWith(fileSeparator) }
             ?.let { it + TEMP_DIR_NAME + fileSeparator + fileName } ?: (tmpDir + fileSeparator + TEMP_DIR_NAME + fileSeparator + fileName)
-        return fileUtils.getFileFromPath(platformFileSystem.getUri(filePath), false)?.takeIf { it.getExists() }
+        return fileUtils.getFileFromPath(filePath, false)?.takeIf { it.getExists() }
     }
 
     override suspend fun fetchFile(url: String): Result<IPlatformFile> {
         val tmpDir = platformFileSystem.getTempDirectory()
         val dirPath = tmpDir.takeIf { it.endsWith(platformFileSystem.getFileSeparator()) }
             ?.let { it + TEMP_DIR_NAME } ?: (tmpDir + platformFileSystem.getFileSeparator() + TEMP_DIR_NAME)
-        return fileUtils.getFileFromPath(platformFileSystem.getUri(dirPath), true)?.let { dir ->
+        return fileUtils.getFileFromPath(dirPath, true)?.let { dir ->
             val exists = if(!dir.getExists()){
                 dir.mkdir()
             } else true

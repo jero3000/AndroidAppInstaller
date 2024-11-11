@@ -48,6 +48,7 @@ kotlin {
             implementation(libs.commons.net)
             implementation(libs.multiplatform.settings)
             implementation(libs.cryptography.provider.jdk)
+            implementation(libs.appdirs)
         }
 
         commonTest.dependencies {

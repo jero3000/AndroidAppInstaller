@@ -1,10 +1,14 @@
 package org.example.project.appinstaller.platform.filesystem
 
+import net.harawata.appdirs.AppDirsFactory
 import java.io.File
 import java.nio.file.Paths
 
 
 actual class PlatformFileSystemImpl : PlatformFileSystem {
+    override fun getAppDataDirectory(): String {
+        return AppDirsFactory.getInstance().getUserDataDir("AndroidAppInstaller", null, "jero3000")
+    }
 
     override fun getUserDirectory(): String {
         return System.getProperty("user.home")

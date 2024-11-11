@@ -27,7 +27,7 @@ import org.koin.core.qualifier.named
 val repositoryModule = module {
     includes(platformModule, systemDataSourceModule)
 
-    factory<ConfigurationDataSource> { ConfigurationLocalDataSource(Dispatchers.IO, get()) }
+    factory<ConfigurationDataSource> { ConfigurationLocalDataSource(Dispatchers.IO, get(), get(), get()) }
     singleOf(::ConfigurationRepositoryImpl) { bind<ConfigurationRepository>() }
 
     factory<FileDataSource> {
