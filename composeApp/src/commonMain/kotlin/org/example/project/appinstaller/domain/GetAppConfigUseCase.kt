@@ -4,7 +4,7 @@ import org.example.project.appinstaller.model.AppConfig
 import org.example.project.appinstaller.repository.config.ConfigurationRepository
 
 class GetAppConfigUseCase(val repository: ConfigurationRepository) {
-    suspend operator fun invoke() : Result<AppConfig> {
-        return repository.getConfiguration()?.let { Result.success(it) } ?: repository.fetchConfiguration()
+    operator fun invoke() : AppConfig? {
+        return repository.getConfiguration()
     }
 }

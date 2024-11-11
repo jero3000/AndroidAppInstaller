@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.example.project.appinstaller.domain.GetAppConfigFlowUseCase
 import org.example.project.appinstaller.domain.GetAppConfigUseCase
 import org.example.project.appinstaller.domain.GetPackageFileUseCase
 import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
@@ -20,6 +21,7 @@ import org.example.project.appinstaller.ui.screen.setup.model.SetupState
 import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
 
 class SetupViewModel(
+    private val getAppConfigFlow : GetAppConfigFlowUseCase,
     private val getAppConfig : GetAppConfigUseCase,
     private val resolveUrl: ResolvePackageUrlUseCase,
     private val getPackageFile: GetPackageFileUseCase,
@@ -34,15 +36,17 @@ class SetupViewModel(
 
     init{
         viewModelScope.launch {
-            val appConfigResult = getAppConfig()
-            appConfigResult.getOrNull()?.let { appConfig ->
-                _uiState.update { _ ->
-                    SetupState(appConfig.projects.map { it.name })
-                }
-            } ?: run {
-                appConfigResult.exceptionOrNull()?.stackTraceToString()?.let { error ->
-                    _uiState.update { currentState ->
-                        currentState.copy(error = SetupState.Error.GenericError(error))
+            getAppConfigFlow().collect{ appConfigResult ->
+                appConfigResult.getOrNull()?.let { appConfig ->
+                    _uiState.update { _ ->
+                        SetupState(appConfig.projects.map { it.name })
+                    }
+                } ?: run {
+                    //Notify the error loading the app config
+                    appConfigResult.exceptionOrNull()?.stackTraceToString()?.let { error ->
+                        _uiState.update { currentState ->
+                            currentState.copy(error = SetupState.Error.GenericError(error))
+                        }
                     }
                 }
             }
@@ -122,8 +126,7 @@ class SetupViewModel(
     }
 
     private fun selectProject(selected: String) = viewModelScope.launch {
-        val appConfig = getAppConfig().getOrNull()
-        appConfig?.let {
+        getAppConfig()?.let { appConfig ->
             _uiState.update { currentState ->
                 val project = appConfig.projects.find { it.name == selected }!!
                 currentState.copy(
@@ -135,8 +138,7 @@ class SetupViewModel(
     }
 
     private fun selectTarget(selected: String) = viewModelScope.launch {
-        val appConfig = getAppConfig().getOrNull()
-        appConfig?.let {
+        getAppConfig()?.let { appConfig ->
             _uiState.update { currentState ->
                 val project = appConfig.projects.find { it.name == currentState.selectedProject }!!
                 val variant = project.buildVariants.find { it.name == selected }
@@ -172,8 +174,8 @@ class SetupViewModel(
         }
     }
 
-    private suspend fun getBuildVariant(): BuildVariant {
-        val appConfig = getAppConfig().getOrNull()!!
+    private fun getBuildVariant(): BuildVariant {
+        val appConfig = getAppConfig()!!
         val project = appConfig.projects.first{ it.name == _uiState.value.selectedProject}
         return project.buildVariants.first { it.name ==  _uiState.value.selectedTarget }
     }

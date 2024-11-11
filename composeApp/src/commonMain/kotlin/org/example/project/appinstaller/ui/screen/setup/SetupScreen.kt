@@ -1,7 +1,10 @@
 package org.example.project.appinstaller.ui.screen.setup
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -14,7 +17,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import org.example.project.appinstaller.model.Credential
@@ -41,71 +46,84 @@ class SetupScreen: Screen {
             lifecycleOwner = LocalLifecycleOwner.current
         )
 
-        Column(
-            modifier = Modifier.padding(20.dp).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            DropDownRow(
-                modifier = Modifier.padding(top = 20.dp),
-                label = "Project",
-                options = uiState.projects,
-                default = uiState.selectedProject ?: "Not set"
-            ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
-            DropDownRow(
-                modifier = Modifier.padding(top = 20.dp),
-                label = "Target",
-                options = uiState.targets,
-                default = uiState.selectedTarget ?: "Not set"
-            ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+        if(uiState.projects.isEmpty()){
+            Column(
+                modifier = Modifier.padding(20.dp).fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
 
-            val versionState = rememberVersionState()
-            versionState.major = uiState.selectedVersion?.major ?: ""
-            versionState.minor = uiState.selectedVersion?.minor ?: ""
-            versionState.micro = uiState.selectedVersion?.micro ?: ""
-            versionState.build = uiState.selectedVersion?.build ?: ""
-            VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
+            ) {
+                Text(text = "Application configuration required. Please load a configuration file: File > load configuration...",
+                    textAlign = TextAlign.Center,
+                    fontSize = 24.sp)
+            }
+        } else {
+            Column(
+                modifier = Modifier.padding(20.dp).fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DropDownRow(
+                    modifier = Modifier.padding(top = 20.dp),
+                    label = "Project",
+                    options = uiState.projects,
+                    default = uiState.selectedProject ?: "Not set"
+                ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
+                DropDownRow(
+                    modifier = Modifier.padding(top = 20.dp),
+                    label = "Target",
+                    options = uiState.targets,
+                    default = uiState.selectedTarget ?: "Not set"
+                ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
 
-            Button(
-                modifier = Modifier.padding(top = 20.dp),
-                colors = ButtonDefaults.buttonColors(),
-                onClick = {
-                    viewModel.onEvent(
-                        SetupEvent.OnDownloadClicked(
-                            SetupVersion(
-                                versionState.major,
-                                versionState.minor,
-                                versionState.micro,
-                                versionState.build
+                val versionState = rememberVersionState()
+                versionState.major = uiState.selectedVersion?.major ?: ""
+                versionState.minor = uiState.selectedVersion?.minor ?: ""
+                versionState.micro = uiState.selectedVersion?.micro ?: ""
+                versionState.build = uiState.selectedVersion?.build ?: ""
+                VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
+
+                Button(
+                    modifier = Modifier.padding(top = 20.dp),
+                    colors = ButtonDefaults.buttonColors(),
+                    onClick = {
+                        viewModel.onEvent(
+                            SetupEvent.OnDownloadClicked(
+                                SetupVersion(
+                                    versionState.major,
+                                    versionState.minor,
+                                    versionState.micro,
+                                    versionState.build
+                                )
                             )
                         )
-                    )
-                }) {
-                Text("Download")
-            }
-            Row {
-                Column(
-                    modifier = Modifier.wrapContentSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row {
-                        Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
-                    }
-                    uiState.packages.forEach { appPackage ->
-                        AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
-                            appName = appPackage.name,
-                            color = getAppColor(appPackage.state),
-                            checked = appPackage.selected,
-                            state = getAppState(appPackage.state),
-                            isTransient = isTransientState(appPackage.state),
-                            onCheckedChanged = { checked ->
-                                viewModel.onEvent(
-                                    SetupEvent.OnSetupPackageChanged(
-                                        appPackage.packageName,
-                                        checked
+                    }) {
+                    Text("Download")
+                }
+                Row {
+                    Column(
+                        modifier = Modifier.wrapContentSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row {
+                            Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
+                        }
+                        uiState.packages.forEach { appPackage ->
+                            AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
+                                appName = appPackage.name,
+                                color = getAppColor(appPackage.state),
+                                checked = appPackage.selected,
+                                state = getAppState(appPackage.state),
+                                isTransient = isTransientState(appPackage.state),
+                                onCheckedChanged = { checked ->
+                                    viewModel.onEvent(
+                                        SetupEvent.OnSetupPackageChanged(
+                                            appPackage.packageName,
+                                            checked
+                                        )
                                     )
-                                )
-                            }
-                        )
+                                }
+                            )
+                        }
                     }
                 }
             }
