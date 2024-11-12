@@ -25,7 +25,7 @@ fun DropDownRow(modifier: Modifier = Modifier,
     Row (modifier) {
         var expanded by remember { mutableStateOf(false) }
         var text by remember { mutableStateOf(default) }
-
+        text = default
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = it },

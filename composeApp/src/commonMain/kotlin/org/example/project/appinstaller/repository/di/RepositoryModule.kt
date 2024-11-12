@@ -14,6 +14,8 @@ import org.example.project.appinstaller.repository.file.FileRepository
 import org.example.project.appinstaller.repository.file.FileRepositoryImpl
 import org.example.project.appinstaller.repository.file.datasource.FileDataSource
 import org.example.project.appinstaller.repository.file.datasource.FileDataSourceResolver
+import org.example.project.appinstaller.repository.preferences.ApplicationPreferences
+import org.example.project.appinstaller.repository.preferences.ApplicationPreferencesImpl
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.withOptions
@@ -41,6 +43,8 @@ val repositoryModule = module {
 
     factory<CredentialDataSource> { CredentialPreferencesDataSource(get(), Dispatchers.IO) }
     single<CredentialRepository> { CredentialRepositoryImpl(get()) }
+
+    factory<ApplicationPreferences> { (context : String) -> ApplicationPreferencesImpl(context, get(), Dispatchers.IO) }
 }
 
 expect val systemDataSourceModule: Module

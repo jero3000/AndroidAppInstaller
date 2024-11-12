@@ -15,6 +15,7 @@ import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
 import org.example.project.appinstaller.domain.StoreCredentialsUseCase
 import org.example.project.appinstaller.model.BuildVariant
 import org.example.project.appinstaller.model.exception.CredentialsRequiredException
+import org.example.project.appinstaller.repository.preferences.ApplicationPreferences
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
@@ -25,7 +26,8 @@ class SetupViewModel(
     private val getAppConfig : GetAppConfigUseCase,
     private val resolveUrl: ResolvePackageUrlUseCase,
     private val getPackageFile: GetPackageFileUseCase,
-    private val storeCredential: StoreCredentialsUseCase
+    private val storeCredential: StoreCredentialsUseCase,
+    private val preferences: ApplicationPreferences
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
     val uiState: StateFlow<SetupState> = _uiState.stateIn(
@@ -41,6 +43,7 @@ class SetupViewModel(
                     _uiState.update { _ ->
                         SetupState(appConfig.projects.map { it.name })
                     }
+                    readPreferences()
                 } ?: run {
                     //Notify the error loading the app config
                     appConfigResult.exceptionOrNull()?.stackTraceToString()?.let { error ->
@@ -61,6 +64,7 @@ class SetupViewModel(
 
                 viewModelScope.launch {
                     startDownload(event.version)
+                    storePreferences()
                 }
             }
             is SetupEvent.OnProjectSelected -> {
@@ -125,7 +129,7 @@ class SetupViewModel(
         }
     }
 
-    private fun selectProject(selected: String) = viewModelScope.launch {
+    private fun selectProject(selected: String) {
         getAppConfig()?.let { appConfig ->
             _uiState.update { currentState ->
                 val project = appConfig.projects.find { it.name == selected }!!
@@ -137,7 +141,7 @@ class SetupViewModel(
         }
     }
 
-    private fun selectTarget(selected: String) = viewModelScope.launch {
+    private fun selectTarget(selected: String) {
         getAppConfig()?.let { appConfig ->
             _uiState.update { currentState ->
                 val project = appConfig.projects.find { it.name == currentState.selectedProject }!!
@@ -178,5 +182,37 @@ class SetupViewModel(
         val appConfig = getAppConfig()!!
         val project = appConfig.projects.first{ it.name == _uiState.value.selectedProject}
         return project.buildVariants.first { it.name ==  _uiState.value.selectedTarget }
+    }
+
+    private suspend fun storePreferences(){
+        _uiState.value.selectedProject?.let { preferences.putString(PROJECT_KEY, it) }
+        _uiState.value.selectedTarget?.let { preferences.putString(VARIANT_KEY, it) }
+        _uiState.value.selectedVersion?.let {
+            val build = it.build ?: ""
+            preferences.putString(VERSION_KEY, "${it.major}.${it.minor}.${it.micro}.${build}")
+        }
+    }
+
+    private suspend fun readPreferences(){
+        getAppConfig()?.let { appConfig ->
+            println("Reading preferences...")
+            val project = preferences.getString(PROJECT_KEY)?.takeIf { project -> appConfig.projects.map { it.name }.contains(project) }
+            println("project: $project")
+            val variant = if(project != null){
+                preferences.getString(VARIANT_KEY)?.takeIf { variant -> appConfig.projects.first{ it.name == project }.buildVariants.map { it.name }.contains(variant) }
+            } else null
+            val version = preferences.getString(VERSION_KEY)?.split(".")?.let { version ->
+                SetupVersion(version[0], version[1], version[2], version[3].takeIf { it.isNotEmpty() })
+            }
+            project?.let { selectProject(it) }
+            variant?.let { selectTarget(it) }
+            _uiState.update { it.copy(selectedVersion = version) }
+        }
+    }
+
+    companion object{
+        private const val PROJECT_KEY = "project"
+        private const val VARIANT_KEY = "variant"
+        private const val VERSION_KEY = "version"
     }
 }
