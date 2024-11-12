@@ -1,11 +1,10 @@
-package org.example.project.appinstaller.repository
+package org.example.project.appinstaller.repository.file
 
 import dev.mokkery.mock
 import org.example.project.appinstaller.platform.filesystem.FileUtils
 import org.example.project.appinstaller.platform.filesystem.PlatformFileSystem
 import org.example.project.appinstaller.platform.uri.UriParser
 import org.example.project.appinstaller.repository.credential.CredentialRepository
-import org.example.project.appinstaller.repository.file.FileRepositoryImpl
 import org.example.project.appinstaller.repository.file.datasource.FileDataSource
 import org.junit.Test
 import dev.mokkery.MockMode.autofill
