@@ -16,7 +16,9 @@ val uiModule = module {
             get(),
             get(),
             get(),
-            get { parametersOf("com.jero3000.appinstaller.setup") })
+            get { parametersOf("com.jero3000.appinstaller.setup") },
+            get(),
+            get())
     }
     factoryOf(::SettingsScreenModel)
 }

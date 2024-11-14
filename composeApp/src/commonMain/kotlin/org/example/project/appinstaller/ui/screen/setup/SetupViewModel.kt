@@ -8,9 +8,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.example.project.appinstaller.domain.DiscoverDevicesUseCase
 import org.example.project.appinstaller.domain.GetAppConfigFlowUseCase
 import org.example.project.appinstaller.domain.GetAppConfigUseCase
 import org.example.project.appinstaller.domain.GetPackageFileUseCase
+import org.example.project.appinstaller.domain.InstallAppPackageUseCase
 import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
 import org.example.project.appinstaller.domain.StoreCredentialsUseCase
 import org.example.project.appinstaller.model.BuildVariant
@@ -27,7 +29,9 @@ class SetupViewModel(
     private val resolveUrl: ResolvePackageUrlUseCase,
     private val getPackageFile: GetPackageFileUseCase,
     private val storeCredential: StoreCredentialsUseCase,
-    private val preferences: ApplicationPreferences
+    private val preferences: ApplicationPreferences,
+    private val discoverDevices: DiscoverDevicesUseCase,
+    private val installPackage: InstallAppPackageUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
     val uiState: StateFlow<SetupState> = _uiState.stateIn(
@@ -37,7 +41,7 @@ class SetupViewModel(
     )
 
     init{
-        viewModelScope.launch {
+        viewModelScope.launch { //Handles the app configuration loading
             getAppConfigFlow().collect{ appConfigResult ->
                 appConfigResult.getOrNull()?.let { appConfig ->
                     _uiState.update { _ ->
@@ -54,6 +58,11 @@ class SetupViewModel(
                 }
             }
         }
+        viewModelScope.launch { //Handles the Android device discovery
+            discoverDevices().collect{ devices ->
+                _uiState.update { it.copy(devices = devices) }
+            }
+        }
     }
 
     fun onEvent(event: SetupEvent) {
@@ -67,6 +76,9 @@ class SetupViewModel(
                     storePreferences()
                 }
             }
+            is SetupEvent.OnInstall -> viewModelScope.launch {
+                startInstall()
+            }
             is SetupEvent.OnProjectSelected -> {
                 selectProject(event.selected)
             }
@@ -75,6 +87,9 @@ class SetupViewModel(
             }
             is SetupEvent.OnTargetSelected -> {
                 selectTarget(event.selected)
+            }
+            is SetupEvent.OnDeviceSelected -> {
+                _uiState.update { it.copy(selectedDevice = event.selected) }
             }
             is SetupEvent.OnErrorAck -> {
                 _uiState.update { it.copy(error = null) }
@@ -112,6 +127,27 @@ class SetupViewModel(
                 updatePackage(app.packageName, SetupPackage.State.Error)
                 result.exceptionOrNull()?.let {
                     processDownloadException(it)
+                }
+            }
+        }
+    }
+
+    private suspend fun startInstall() {
+        val variant = getBuildVariant()
+        val device = uiState.value.selectedDevice!!
+        _uiState.value.packages.filter { it.selected }.forEach{ app ->
+            println("Installing ${app.name}")
+            val appPackage = variant.packages.first{it.packageName == app.packageName}
+            updatePackage(app.packageName, SetupPackage.State.Installing)
+            val result = installPackage(device.serial, appPackage)
+            if(result.isSuccess){
+                updatePackage(app.packageName, SetupPackage.State.Installed)
+            } else {
+                updatePackage(app.packageName, SetupPackage.State.Error)
+                result.exceptionOrNull()?.let { exception ->
+                    _uiState.update { currentState ->
+                        currentState.copy(error = SetupState.Error.GenericError(exception.stackTraceToString()))
+                    }
                 }
             }
         }

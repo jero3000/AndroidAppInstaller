@@ -62,18 +62,19 @@ class SetupScreen: Screen {
                 modifier = Modifier.padding(20.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                DropDownRow(
-                    modifier = Modifier.padding(top = 20.dp),
-                    label = "Project",
-                    options = uiState.projects,
-                    default = uiState.selectedProject ?: "Not set"
-                ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
-                DropDownRow(
-                    modifier = Modifier.padding(top = 20.dp),
-                    label = "Target",
-                    options = uiState.targets,
-                    default = uiState.selectedTarget ?: "Not set"
-                ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+                Row{
+                    DropDownRow(
+                        modifier = Modifier.padding(end = 10.dp),
+                        label = "Project",
+                        options = uiState.projects,
+                        default = uiState.selectedProject ?: "Not set"
+                    ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
+                    DropDownRow(
+                        label = "Target",
+                        options = uiState.targets,
+                        default = uiState.selectedTarget ?: "Not set"
+                    ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+                }
 
                 val versionState = rememberVersionState()
                 versionState.major = uiState.selectedVersion?.major ?: ""
@@ -82,22 +83,40 @@ class SetupScreen: Screen {
                 versionState.build = uiState.selectedVersion?.build ?: ""
                 VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
 
-                Button(
+                DropDownRow(
                     modifier = Modifier.padding(top = 20.dp),
-                    colors = ButtonDefaults.buttonColors(),
-                    onClick = {
-                        viewModel.onEvent(
-                            SetupEvent.OnDownloadClicked(
-                                SetupVersion(
-                                    versionState.major,
-                                    versionState.minor,
-                                    versionState.micro,
-                                    versionState.build
+                    label = "Device",
+                    options = uiState.devices.map { it.label },
+                    default = uiState.selectedDevice?.label ?: "Not set"
+                ) { labelSelected ->
+                    uiState.devices.firstOrNull { it.label == labelSelected }?.let {
+                        viewModel.onEvent(SetupEvent.OnDeviceSelected(it))
+                    }
+                }
+
+                Row(modifier = Modifier.padding(top = 20.dp)) {
+                    Button(
+                        colors = ButtonDefaults.buttonColors(),
+                        onClick = {
+                            viewModel.onEvent(
+                                SetupEvent.OnDownloadClicked(
+                                    SetupVersion(
+                                        versionState.major,
+                                        versionState.minor,
+                                        versionState.micro,
+                                        versionState.build
+                                    )
                                 )
                             )
-                        )
-                    }) {
-                    Text("Download")
+                        }) {
+                        Text("Download")
+                    }
+                    Button(
+                        modifier = Modifier.padding(start = 10.dp),
+                        colors = ButtonDefaults.buttonColors(),
+                        onClick = { viewModel.onEvent(SetupEvent.OnInstall) }) {
+                        Text("Install")
+                    }
                 }
                 Row {
                     Column(

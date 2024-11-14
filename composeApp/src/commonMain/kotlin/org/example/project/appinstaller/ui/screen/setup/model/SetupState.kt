@@ -1,11 +1,15 @@
 package org.example.project.appinstaller.ui.screen.setup.model
 
+import org.example.project.appinstaller.model.AndroidDevice
+
 data class SetupState(
     val projects : List<String> = emptyList(),
     val selectedProject: String? = null,
     val targets : List<String> = emptyList(),
     val selectedTarget: String? = null,
     val selectedVersion: SetupVersion? = null,
+    val devices : List<AndroidDevice> = emptyList(),
+    val selectedDevice: AndroidDevice? = null,
     val packages : List<SetupPackage> = emptyList(),
     val error: Error? = null
 ){

@@ -47,6 +47,8 @@ filekit-core = { module = "io.github.vinceglb:filekit-core", version.ref="fileki
 filekit-compose = { module = "io.github.vinceglb:filekit-compose", version.ref="filekit" }
 kmpFile-filekit = { module = "dev.zwander:kmpfile-filekit", version.ref = "kmpFileVersion"}
 appdirs = { module = "net.harawata:appdirs", version = "1.2.2" }
+dadb = { module = "dev.mobile:dadb", version = "1.2.8" }
+jadb = { module = "com.github.vidstige:jadb", version = "1.2.1"}
 
 [plugins]
 jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }

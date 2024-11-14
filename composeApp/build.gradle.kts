@@ -52,6 +52,8 @@ kotlin {
             implementation(libs.multiplatform.settings)
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.appdirs)
+            implementation(libs.dadb)
+            implementation(libs.jadb)
         }
 
         commonTest.dependencies {
