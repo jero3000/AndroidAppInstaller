@@ -7,5 +7,3 @@ interface PlatformFileSystem {
     fun getFileSeparator(): String
     fun getUri(path: String): String
 }
-
-expect class PlatformFileSystemImpl

@@ -5,7 +5,7 @@ import java.io.File
 import java.nio.file.Paths
 
 
-actual class PlatformFileSystemImpl : PlatformFileSystem {
+class PlatformFileSystemImpl : PlatformFileSystem {
     override fun getAppDataDirectory(): String {
         return AppDirsFactory.getInstance().getUserDataDir("AndroidAppInstaller", null, "jero3000")
     }
