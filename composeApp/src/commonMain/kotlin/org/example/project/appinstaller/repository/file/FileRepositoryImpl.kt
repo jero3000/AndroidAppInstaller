@@ -47,6 +47,17 @@ class FileRepositoryImpl(private val dataSource: FileDataSource,
         } ?: Result.failure(Exception("Cannot create the temp dir"))
     }
 
+    override suspend fun clear() {
+        val tmpDir = platformFileSystem.getTempDirectory()
+        val dirPath = tmpDir.takeIf { it.endsWith(platformFileSystem.getFileSeparator()) }
+            ?.let { it + TEMP_DIR_NAME } ?: (tmpDir + platformFileSystem.getFileSeparator() + TEMP_DIR_NAME)
+        fileUtils.getFileFromPath(dirPath, true)?.let { dir ->
+            dir.listFiles()?.forEach {
+                it.delete()
+            }
+        }
+    }
+
     companion object{
         private const val TEMP_DIR_NAME = "AndroidAppInstaller"
     }

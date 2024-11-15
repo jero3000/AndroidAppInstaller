@@ -1,5 +1,6 @@
 package org.example.project.appinstaller.domain.di
 
+import org.example.project.appinstaller.domain.ClearCacheUseCase
 import org.example.project.appinstaller.domain.ClearCredentialsUseCase
 import org.example.project.appinstaller.domain.DiscoverDevicesUseCase
 import org.example.project.appinstaller.domain.GetAppConfigFlowUseCase
@@ -22,4 +23,5 @@ val domainModule = module {
     factoryOf(::ClearCredentialsUseCase)
     factoryOf(::DiscoverDevicesUseCase)
     factoryOf(::InstallAppPackageUseCase)
+    factoryOf(::ClearCacheUseCase)
 }

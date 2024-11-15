@@ -36,11 +36,15 @@ class SettingsScreen : Screen{
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AnimatedButton("Clear credentials") {
-                    screenModel.onEvent(SettingsEvent.OnClearCredentials)
+                Row{
+                    AnimatedButton(text = "Clear credentials") {
+                        screenModel.onEvent(SettingsEvent.OnClearCredentials)
+                    }
+                    AnimatedButton(modifier = Modifier.padding(start = 10.dp), text = "Clear cache") {
+                        screenModel.onEvent(SettingsEvent.OnClearCache)
+                    }
                 }
             }
         }
-
     }
 }
