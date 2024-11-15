@@ -1,21 +1,25 @@
 package org.example.project.appinstaller.ui.screen.setup
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -94,7 +98,7 @@ class SetupScreen: Screen {
                     }
                 }
 
-                Row(modifier = Modifier.padding(top = 20.dp)) {
+                Row(modifier = Modifier.padding(top = 20.dp, bottom = 14.dp)) {
                     Button(
                         colors = ButtonDefaults.buttonColors(),
                         onClick = {
@@ -118,15 +122,23 @@ class SetupScreen: Screen {
                         Text("Install")
                     }
                 }
-                Row {
-                    Column(
-                        modifier = Modifier.wrapContentSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Row {
-                            Text(modifier = Modifier.padding(top = 20.dp), text = "Apps:")
-                        }
-                        uiState.packages.forEach { appPackage ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.LightGray)
+                        .padding(6.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Apps",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
+                LazyColumn(
+                    modifier = Modifier.wrapContentSize().padding(top = 10.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    content = {
+                        items(uiState.packages){ appPackage ->
                             AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
                                 appName = appPackage.name,
                                 color = getAppColor(appPackage.state),
@@ -144,7 +156,7 @@ class SetupScreen: Screen {
                             )
                         }
                     }
-                }
+                )
             }
         }
 
