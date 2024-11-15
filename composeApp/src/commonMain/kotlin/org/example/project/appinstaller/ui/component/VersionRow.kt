@@ -35,7 +35,7 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.major,
             onValueChange = { value ->
                 versionState.major = value
-                valid = value.isEmpty() || value.toIntOrNull()?.let { it >= 0 } ?: false
+                valid = checkVersionIsValid(value, versionState)
             },
             isError = !valid,
             label = { Text("Major", style = MaterialTheme.typography.labelSmall) },
@@ -46,7 +46,7 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.minor,
             onValueChange = { value ->
                 versionState.minor = value
-                valid = value.isEmpty() || value.toIntOrNull()?.let { it >= 0 } ?: false
+                valid = checkVersionIsValid(value, versionState)
             },
             isError = !valid,
             label = { Text("Minor", style = MaterialTheme.typography.labelSmall) },
@@ -57,7 +57,7 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.micro,
             onValueChange = { value ->
                 versionState.micro = value
-                valid = value.isEmpty() || value.toIntOrNull()?.let { it >= 0 } ?: false
+                valid = checkVersionIsValid(value, versionState)
             },
             isError = !valid,
             label = { Text("Micro", style = MaterialTheme.typography.labelSmall) },
@@ -68,11 +68,16 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.build,
             onValueChange = { value ->
                 versionState.build = value
-                valid = value.isEmpty() || value.toIntOrNull()?.let { it >= 0 } ?: false
+                valid = checkVersionIsValid(value, versionState)
             },
             isError = !valid,
             label = { Text("Build", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
     }
+}
+
+fun checkVersionIsValid(value: String, versionState: VersionState): Boolean {
+    return (value.isEmpty() || value.toIntOrNull()?.let { it >= 0 } ?: false) &&
+    versionState.major.isNotBlank() && versionState.micro.isNotBlank() && versionState.minor.isNotBlank()
 }
