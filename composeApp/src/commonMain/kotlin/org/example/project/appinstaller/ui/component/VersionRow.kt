@@ -21,23 +21,30 @@ class VersionState{
     var minor by mutableStateOf("")
     var micro by mutableStateOf("")
     var build by mutableStateOf("")
+
+    val versionValid: Boolean
+        get() =
+            major.isNotBlank() && major.toIntOrNull()?.let { it >= 0 } ?: false &&
+                    minor.isNotBlank() && minor.toIntOrNull()?.let { it >= 0 } ?: false &&
+                    micro.isNotBlank() && micro.toIntOrNull()?.let { it >= 0 } ?: false &&
+                    (build.isBlank() || build.toIntOrNull()?.let { it >= 0 } ?: false)
+
 }
 
 @Composable
 fun rememberVersionState() = remember { VersionState() }
 
 @Composable
-fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = rememberVersionState()){
+fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = rememberVersionState(), onVersionEntered: () -> Unit = {}){
     Row(modifier = modifier) {
-        var valid by remember { mutableStateOf(true) }
         TextField(
             modifier = Modifier.width(80.dp),
             value = versionState.major,
             onValueChange = { value ->
                 versionState.major = value
-                valid = checkVersionIsValid(value, versionState)
+                onVersionEntered()
             },
-            isError = !valid,
+            isError = !versionState.versionValid,
             label = { Text("Major", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
@@ -46,9 +53,9 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.minor,
             onValueChange = { value ->
                 versionState.minor = value
-                valid = checkVersionIsValid(value, versionState)
+                onVersionEntered()
             },
-            isError = !valid,
+            isError = !versionState.versionValid,
             label = { Text("Minor", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
@@ -57,9 +64,9 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.micro,
             onValueChange = { value ->
                 versionState.micro = value
-                valid = checkVersionIsValid(value, versionState)
+                onVersionEntered()
             },
-            isError = !valid,
+            isError = !versionState.versionValid,
             label = { Text("Micro", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
@@ -68,16 +75,12 @@ fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = remem
             value = versionState.build,
             onValueChange = { value ->
                 versionState.build = value
-                valid = checkVersionIsValid(value, versionState)
+                onVersionEntered()
             },
-            isError = !valid,
+            isError = !versionState.versionValid,
             label = { Text("Build", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
     }
 }
 
-fun checkVersionIsValid(value: String, versionState: VersionState): Boolean {
-    return (value.isEmpty() || value.toIntOrNull()?.let { it >= 0 } ?: false) &&
-    versionState.major.isNotBlank() && versionState.micro.isNotBlank() && versionState.minor.isNotBlank()
-}

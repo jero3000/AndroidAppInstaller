@@ -85,7 +85,16 @@ class SetupScreen: Screen {
                 versionState.minor = uiState.selectedVersion?.minor ?: ""
                 versionState.micro = uiState.selectedVersion?.micro ?: ""
                 versionState.build = uiState.selectedVersion?.build ?: ""
-                VersionRow(modifier = Modifier.padding(top = 20.dp), versionState)
+                VersionRow(modifier = Modifier.padding(top = 20.dp), versionState){
+                    viewModel.onEvent(SetupEvent.OnVersionEntered(
+                        SetupVersion(
+                            versionState.major.takeIf { it.isNotBlank() },
+                            versionState.minor.takeIf { it.isNotBlank() },
+                            versionState.micro.takeIf { it.isNotBlank() },
+                            versionState.build.takeIf { it.isNotBlank() }
+                        )
+                    ))
+                }
 
                 DropDownRow(
                     modifier = Modifier.padding(top = 20.dp),
@@ -101,18 +110,7 @@ class SetupScreen: Screen {
                 Row(modifier = Modifier.padding(top = 20.dp, bottom = 14.dp)) {
                     Button(
                         colors = ButtonDefaults.buttonColors(),
-                        onClick = {
-                            viewModel.onEvent(
-                                SetupEvent.OnDownloadClicked(
-                                    SetupVersion(
-                                        versionState.major,
-                                        versionState.minor,
-                                        versionState.micro,
-                                        versionState.build
-                                    )
-                                )
-                            )
-                        }) {
+                        onClick = { viewModel.onEvent(SetupEvent.OnDownloadClicked) },
                         Text("Download")
                     }
                     Button(

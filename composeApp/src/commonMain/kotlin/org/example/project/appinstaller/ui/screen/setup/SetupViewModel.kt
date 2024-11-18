@@ -68,11 +68,13 @@ class SetupViewModel(
     fun onEvent(event: SetupEvent) {
         when(event){
             is SetupEvent.OnDownloadClicked -> {
-                println("Init download for version R${event.version.major}.${event.version.minor}.${event.version.micro}(${event.version.build})")
-                _uiState.update { it.copy(selectedVersion = event.version) }
+                println("Init download for version R${uiState.value.selectedVersion?.major}." +
+                        "${uiState.value.selectedVersion?.minor}." +
+                        "${uiState.value.selectedVersion?.micro}" +
+                        "(${uiState.value.selectedVersion?.build})")
 
                 viewModelScope.launch {
-                    startDownload(event.version)
+                    startDownload(uiState.value.selectedVersion!!)
                     storePreferences()
                 }
             }
@@ -81,6 +83,9 @@ class SetupViewModel(
             }
             is SetupEvent.OnProjectSelected -> {
                 selectProject(event.selected)
+            }
+            is SetupEvent.OnVersionEntered -> {
+                _uiState.update { it.copy(selectedVersion = event.version) }
             }
             is SetupEvent.OnSetupPackageChanged -> {
                 updatePackage(event.packageName, event.checked)
@@ -107,9 +112,9 @@ class SetupViewModel(
     private suspend fun startDownload(version: SetupVersion) {
         val variant = getBuildVariant()
         val placeHolders = mutableMapOf(
-            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major,
-            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to version.minor,
-            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to version.micro
+            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major!!,
+            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to version.minor!!,
+            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to version.micro!!
         )
         version.build?.let { build ->
             placeHolders.put(ResolvePackageUrlUseCase.BUILD_PLACEHOLDER, build)
