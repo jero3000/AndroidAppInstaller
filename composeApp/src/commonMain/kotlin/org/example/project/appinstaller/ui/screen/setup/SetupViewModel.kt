@@ -120,7 +120,8 @@ class SetupViewModel(
             placeHolders.put(ResolvePackageUrlUseCase.BUILD_PLACEHOLDER, build)
         }
 
-        _uiState.value.packages.filter { it.selected }.forEach{ app ->
+        val packagesSelected = _uiState.value.packages.filter { it.selected }
+        for(app in packagesSelected){
             val appPackage = variant.packages.first{it.packageName == app.packageName}
             val url = resolveUrl(variant, appPackage, placeHolders)
             updatePackage(app.packageName, SetupPackage.State.Downloading)
@@ -133,6 +134,7 @@ class SetupViewModel(
                 result.exceptionOrNull()?.let {
                     processDownloadException(it)
                 }
+                break
             }
         }
     }
@@ -140,7 +142,8 @@ class SetupViewModel(
     private suspend fun startInstall() {
         val variant = getBuildVariant()
         val device = uiState.value.selectedDevice!!
-        _uiState.value.packages.filter { it.selected }.forEach{ app ->
+        val packagesSelected = _uiState.value.packages.filter { it.selected }
+        for(app in packagesSelected){
             println("Installing ${app.name}")
             val appPackage = variant.packages.first{it.packageName == app.packageName}
             updatePackage(app.packageName, SetupPackage.State.Installing)
@@ -149,11 +152,8 @@ class SetupViewModel(
                 updatePackage(app.packageName, SetupPackage.State.Installed)
             } else {
                 updatePackage(app.packageName, SetupPackage.State.Error)
-                result.exceptionOrNull()?.let { exception ->
-                    _uiState.update { currentState ->
-                        currentState.copy(error = SetupState.Error.GenericError(exception.stackTraceToString()))
-                    }
-                }
+                result.exceptionOrNull()?.let { notifyGenericError(it) }
+                break
             }
         }
     }
