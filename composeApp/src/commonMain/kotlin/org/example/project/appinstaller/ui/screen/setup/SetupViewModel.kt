@@ -250,7 +250,7 @@ class SetupViewModel(
         _uiState.update { currentState ->
             currentState.copy(
                 error = SetupState.Error.GenericError(
-                    throwable.message ?: (throwable.stackTraceToString().take(170) + "...")
+                    throwable.message?.let { "" + throwable.javaClass.name + ": $it" } ?: (throwable.stackTraceToString().take(170) + "...")
                 )
             )
         }
