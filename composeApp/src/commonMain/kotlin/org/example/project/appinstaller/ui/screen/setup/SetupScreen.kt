@@ -175,8 +175,7 @@ class SetupScreen: Screen {
                 }
 
                 is SetupState.Error.GenericError -> {
-                    println(it.description)
-                    CustomAlertDialog(it.description.take(170) + "...") {
+                    CustomAlertDialog(it.description) {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
                     }
                 }

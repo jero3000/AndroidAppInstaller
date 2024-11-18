@@ -50,11 +50,7 @@ class SetupViewModel(
                     readPreferences()
                 } ?: run {
                     //Notify the error loading the app config
-                    appConfigResult.exceptionOrNull()?.stackTraceToString()?.let { error ->
-                        _uiState.update { currentState ->
-                            currentState.copy(error = SetupState.Error.GenericError(error))
-                        }
-                    }
+                    appConfigResult.exceptionOrNull()?.let { notifyGenericError(it) }
                 }
             }
         }
@@ -164,9 +160,7 @@ class SetupViewModel(
                 currentState.copy(error = SetupState.Error.CredentialsRequired(exception.host))
             }
         } else {
-            _uiState.update { currentState ->
-                currentState.copy(error = SetupState.Error.GenericError(exception.stackTraceToString()))
-            }
+            notifyGenericError(exception)
         }
     }
 
@@ -248,6 +242,17 @@ class SetupViewModel(
             project?.let { selectProject(it) }
             variant?.let { selectTarget(it) }
             _uiState.update { it.copy(selectedVersion = version) }
+        }
+    }
+
+    private fun notifyGenericError(throwable: Throwable){
+        println(throwable.stackTraceToString())
+        _uiState.update { currentState ->
+            currentState.copy(
+                error = SetupState.Error.GenericError(
+                    throwable.message ?: (throwable.stackTraceToString().take(170) + "...")
+                )
+            )
         }
     }
 
