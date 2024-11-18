@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -19,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.style.TextAlign
@@ -128,38 +130,44 @@ class SetupScreen: Screen {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .clip(RoundedCornerShape(5.dp))
                         .background(Color.LightGray)
                         .padding(6.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Apps",
+                        text = "Application packages",
                         style = MaterialTheme.typography.titleMedium,
                     )
                 }
-                LazyColumn(
-                    modifier = Modifier.wrapContentSize().padding(top = 10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    content = {
-                        items(uiState.packages){ appPackage ->
-                            AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
-                                appName = appPackage.name,
-                                color = getAppColor(appPackage.state),
-                                checked = appPackage.selected,
-                                state = getAppState(appPackage.state),
-                                isTransient = isTransientState(appPackage.state),
-                                onCheckedChanged = { checked ->
-                                    viewModel.onEvent(
-                                        SetupEvent.OnSetupPackageChanged(
-                                            appPackage.packageName,
-                                            checked
+                if(uiState.selectedProject != null && uiState.selectedTarget != null) {
+                    LazyColumn(
+                        modifier = Modifier.wrapContentSize().padding(top = 10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        content = {
+                            items(uiState.packages) { appPackage ->
+                                AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
+                                    appName = appPackage.name,
+                                    color = getAppColor(appPackage.state),
+                                    checked = appPackage.selected,
+                                    state = getAppState(appPackage.state),
+                                    isTransient = isTransientState(appPackage.state),
+                                    onCheckedChanged = { checked ->
+                                        viewModel.onEvent(
+                                            SetupEvent.OnSetupPackageChanged(
+                                                appPackage.packageName,
+                                                checked
+                                            )
                                         )
-                                    )
-                                }
-                            )
+                                    }
+                                )
+                            }
                         }
-                    }
-                )
+                    )
+                } else {
+                    Text(modifier = Modifier.padding(top = 20.dp),
+                        text = "You must select at least a project and a target in order to configure the application packages")
+                }
             }
         }
 
