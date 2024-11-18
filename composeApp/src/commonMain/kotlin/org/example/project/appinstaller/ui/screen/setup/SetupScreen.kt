@@ -111,12 +111,17 @@ class SetupScreen: Screen {
                     Button(
                         colors = ButtonDefaults.buttonColors(),
                         onClick = { viewModel.onEvent(SetupEvent.OnDownloadClicked) },
+                        enabled = uiState.selectedProject != null && uiState.selectedTarget != null && versionState.versionValid
+                    ) {
                         Text("Download")
                     }
                     Button(
                         modifier = Modifier.padding(start = 10.dp),
                         colors = ButtonDefaults.buttonColors(),
-                        onClick = { viewModel.onEvent(SetupEvent.OnInstall) }) {
+                        onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
+                        enabled = uiState.selectedDevice != null && uiState.packages.filter { it.selected }
+                            .all { it.state == SetupPackage.State.Downloaded }
+                    ) {
                         Text("Install")
                     }
                 }
