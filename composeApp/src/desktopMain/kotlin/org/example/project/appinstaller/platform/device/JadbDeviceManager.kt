@@ -1,9 +1,9 @@
 package org.example.project.appinstaller.platform.device
 
-import dadb.Dadb
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import org.example.project.appinstaller.utils.runSecure
 import se.vidstige.jadb.JadbConnection
 import kotlin.coroutines.CoroutineContext
 
@@ -16,12 +16,19 @@ class JadbDeviceManager(private val ioContext: CoroutineContext) : DeviceManager
 
     override suspend fun scan() = withContext(ioContext){
         mutex.withLock {
-            jadbMutex.withLock { adbConnection.devices }.map { JadbDevice(it, ioContext, jadbMutex) }.forEach { device ->
+            val result = jadbMutex.withLock { runSecure(timeMillis = 5000) { adbConnection.devices } }
+            result.getOrNull()
+                ?.filter { runSecure(timeMillis = 5000){ it.state }.getOrNull() == se.vidstige.jadb.JadbDevice.State.Device }
+                ?.map { JadbDevice(it, ioContext, jadbMutex) }?.forEach { device ->
                 device.getSerial().getOrNull()?.let { serial ->
                     availableDevices[serial] = device
                 }
             }
-            availableDevices.values.toList()
+            if(result.isFailure){
+                result.exceptionOrNull()?.let { Result.failure(it) } ?: Result.failure(Exception("Unknown error discovering for devices"))
+            } else {
+                Result.success(availableDevices.values.toList())
+            }
         }
     }
 

@@ -4,7 +4,7 @@ interface DeviceManager {
     /**
      * Scans for new devices
      */
-    suspend fun scan(): List<Device>
+    suspend fun scan(): Result<List<Device>>
 
     /**
      * Get a device that was previously discovered
