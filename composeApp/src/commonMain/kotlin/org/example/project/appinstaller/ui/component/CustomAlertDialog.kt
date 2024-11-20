@@ -6,15 +6,15 @@ import androidx.compose.material3.Button
 import androidx.compose.runtime.Composable
 
 @Composable
-fun CustomAlertDialog(text: String, onDismiss : () -> Unit) {
+fun CustomAlertDialog(title : String?, text: String?, onDismiss : () -> Unit, onConfirmation : () -> Unit) {
     AlertDialog(
-        onDismissRequest ={},
+        onDismissRequest ={ onDismiss() },
         confirmButton = {
-            Button(onClick = onDismiss){
+            Button(onClick = onConfirmation){
                 Text("Ok")
             }
         },
-        title = { Text("An error has occurred") },
-        text = { Text(text) }
+        title = title?.let{ { Text(title) } },
+        text = text?.let{ { Text(text) } }
     )
 }

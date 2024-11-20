@@ -18,6 +18,7 @@ import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorContent
 import org.example.project.appinstaller.di.appModule
+import org.example.project.appinstaller.ui.component.CustomAlertDialog
 import org.example.project.appinstaller.ui.screen.MenuActions
 import org.example.project.appinstaller.ui.screen.settings.SettingsScreen
 import org.example.project.appinstaller.ui.screen.setup.SetupScreen
@@ -26,6 +27,7 @@ import org.koin.core.context.startKoin
 @OptIn(ExperimentalVoyagerApi::class)
 fun main() = application {
     var isOpen by remember { mutableStateOf(true) }
+    var exitPopup by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     if (isOpen) {
@@ -34,24 +36,31 @@ fun main() = application {
         }
 
         Window(
-            onCloseRequest = ::exitApplication,
+            onCloseRequest = { exitPopup = true },
             title = "Android application installer",
         ) {
             ProvideNavigatorLifecycleKMPSupport {
                 NestedNavigation { navigator ->
                     MenuBar {
                         Menu("File", mnemonic = 'F') {
-                            Item("Load configuration...", onClick = {
-                                MenuActions.loadConfiguration(scope)
-                            })
+                            Item("Load configuration...",
+                                onClick = {
+                                    MenuActions.loadConfiguration(scope)
+                                },
+                                shortcut = KeyShortcut(Key.S, ctrl = true),
+                                mnemonic = 'L'
+                            )
                             Separator()
-                            Item("Settings", onClick = {
-                                navigator push SettingsScreen()
-                            })
+                            Item("Settings",
+                                onClick = {
+                                    navigator push SettingsScreen()
+                                },
+                                shortcut = KeyShortcut(Key.S, ctrl = true, alt = true),
+                                mnemonic = 'S')
                             Separator()
                             Item(
                                 "Exit",
-                                onClick = { isOpen = false },
+                                onClick = { exitPopup = true },
                                 shortcut = KeyShortcut(Key.Escape),
                                 mnemonic = 'E'
                             )
@@ -60,6 +69,13 @@ fun main() = application {
                     MaterialTheme {
                         CurrentScreen()
                     }
+                }
+            }
+            if(exitPopup) {
+                CustomAlertDialog("Are you sure?", null, {
+                    exitPopup = false
+                }) {
+                    isOpen = false
                 }
             }
         }
