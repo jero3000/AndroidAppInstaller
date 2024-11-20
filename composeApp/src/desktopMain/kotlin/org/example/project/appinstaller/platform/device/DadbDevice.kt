@@ -18,11 +18,22 @@ class DadbDevice(private val dadb: Dadb, private val ioContext: CoroutineContext
 
     override suspend fun getModel() = getDeviceProperty("ro.product.model")
 
-    override suspend fun install(app: AppPackage) = withContext(ioContext){
+    override suspend fun install(app: AppPackage, mode: Device.InstallMode): Result<Unit> = withContext(ioContext){
         mutex.withLock {
             dadb.use{ device ->
-                val result = runSecure(timeMillis = 10000) {
-                    device.install(File(app.packageFile!!.getPath()))
+                val result = when(mode){
+                    Device.InstallMode.NORMAL -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
+                        device.install(File(app.packageFile!!.getPath()))
+                    }
+                    Device.InstallMode.DOWNGRADE -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
+                        device.install(File(app.packageFile!!.getPath()), "-d")
+                    }
+                    Device.InstallMode.CLEAN -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
+                        kotlin.runCatching {
+                            device.uninstall(app.packageName)
+                        }
+                        device.install(File(app.packageFile!!.getPath()))
+                    }
                 }
                 if(result.isSuccess){
                     Result.success(Unit)
@@ -36,7 +47,7 @@ class DadbDevice(private val dadb: Dadb, private val ioContext: CoroutineContext
     private suspend fun getDeviceProperty(property: String) = withContext(ioContext){
         mutex.withLock {
             dadb.use{ device ->
-                val result = runSecure(timeMillis = 5000){
+                val result = runSecure(timeMillis = GETPROP_TIMEOUT_MS){
                     device.shell("getprop $property")
                 }
                 if(result.isSuccess && result.getOrNull()!!.exitCode == 0 && result.getOrNull()!!.errorOutput.isEmpty()){
@@ -46,5 +57,10 @@ class DadbDevice(private val dadb: Dadb, private val ioContext: CoroutineContext
                 }
             }
         }
+    }
+
+    companion object{
+        private const val INSTALL_TIMEOUT_MS = 20000L
+        private const val GETPROP_TIMEOUT_MS = 5000L
     }
 }

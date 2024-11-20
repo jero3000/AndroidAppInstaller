@@ -44,7 +44,7 @@ val repositoryModule = module {
     factory<CredentialDataSource> { CredentialPreferencesDataSource(get(), Dispatchers.IO) }
     single<CredentialRepository> { CredentialRepositoryImpl(get()) }
 
-    factory<ApplicationPreferences> { (context : String) -> ApplicationPreferencesImpl(context, get(), Dispatchers.IO) }
+    single<ApplicationPreferences> { ApplicationPreferencesImpl("com.jero3000.appinstaller.preferences", get(), Dispatchers.IO) }
 }
 
 expect val systemDataSourceModule: Module

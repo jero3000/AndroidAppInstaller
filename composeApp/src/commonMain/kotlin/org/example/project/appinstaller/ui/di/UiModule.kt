@@ -9,16 +9,6 @@ import org.koin.core.parameter.parametersOf
 import org.koin.dsl.module
 
 val uiModule = module {
-    viewModel {
-        SetupViewModel(
-            get(),
-            get(),
-            get(),
-            get(),
-            get(),
-            get { parametersOf("com.jero3000.appinstaller.setup") },
-            get(),
-            get())
-    }
+    viewModelOf(::SetupViewModel)
     factoryOf(::SettingsScreenModel)
 }

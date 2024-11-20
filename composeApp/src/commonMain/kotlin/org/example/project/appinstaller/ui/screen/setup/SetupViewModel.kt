@@ -16,6 +16,7 @@ import org.example.project.appinstaller.domain.InstallAppPackageUseCase
 import org.example.project.appinstaller.domain.ResolvePackageUrlUseCase
 import org.example.project.appinstaller.domain.StoreCredentialsUseCase
 import org.example.project.appinstaller.model.BuildVariant
+import org.example.project.appinstaller.model.Settings
 import org.example.project.appinstaller.model.exception.CredentialsRequiredException
 import org.example.project.appinstaller.repository.preferences.ApplicationPreferences
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
@@ -143,7 +144,7 @@ class SetupViewModel(
             println("Installing ${app.name}")
             val appPackage = variant.packages.first{it.packageName == app.packageName}
             updatePackage(app.packageName, SetupPackage.State.Installing)
-            val result = installPackage(device.serial, appPackage)
+            val result = installPackage(device.serial, appPackage, preferences.getString(Settings.INSTALL_MODE.key))
             if(result.isSuccess){
                 updatePackage(app.packageName, SetupPackage.State.Installed)
             } else {

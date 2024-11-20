@@ -25,20 +25,26 @@ class JadbDevice(private val jadb: JadbDevice, private val ioContext: CoroutineC
 
     override suspend fun getModel() = getDeviceProperty("ro.product.model")
 
-    override suspend fun install(app: AppPackage) = withContext(ioContext){
+    override suspend fun install(app: AppPackage, mode: Device.InstallMode): Result<Unit> = withContext(ioContext){
         mutex.withLock {
-            runSecure(timeMillis = 10000) {
-                pm.uninstall(se.vidstige.jadb.managers.Package(app.packageName))
-                pm.install(File(app.packageFile!!.getPath()))
-                //pm.forceInstall(File(app.getPath()))
-                //pm.installWithOptions(File(app.getPath()), listOf(ALLOW_VERSION_DOWNGRADE))
+            when(mode){
+                Device.InstallMode.NORMAL -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
+                    pm.install(File(app.packageFile!!.getPath()))
+                }
+                Device.InstallMode.DOWNGRADE -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
+                    pm.installWithOptions(File(app.packageFile!!.getPath()), listOf(ALLOW_VERSION_DOWNGRADE))
+                }
+                Device.InstallMode.CLEAN -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
+                    pm.uninstall(se.vidstige.jadb.managers.Package(app.packageName))
+                    pm.install(File(app.packageFile!!.getPath()))
+                }
             }
         }
     }
 
     private suspend fun getDeviceProperty(property: String) = withContext(ioContext){
         mutex.withLock {
-            val result = runSecure(timeMillis = 5000) {
+            val result = runSecure(timeMillis = GETPROP_TIMEOUT_MS) {
                 jadb.executeShell("getprop", property).use { stream ->
                     val output = Stream.readAll(stream, StandardCharsets.UTF_8)
                     output.trimEnd()
@@ -50,5 +56,10 @@ class JadbDevice(private val jadb: JadbDevice, private val ioContext: CoroutineC
                 Result.failure(result.exceptionOrNull() ?: Exception("Unable to get the property $property"))
             }
         }
+    }
+
+    companion object{
+        private const val INSTALL_TIMEOUT_MS = 20000L
+        private const val GETPROP_TIMEOUT_MS = 5000L
     }
 }
