@@ -72,7 +72,7 @@ fun main() = application {
                 }
             }
             if(exitPopup) {
-                CustomAlertDialog("Are you sure?", null, {
+                CustomAlertDialog("Are you sure?", null, "Ok", {
                     exitPopup = false
                 }) {
                     isOpen = false

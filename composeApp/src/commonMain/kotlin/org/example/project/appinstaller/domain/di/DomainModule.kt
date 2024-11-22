@@ -3,6 +3,9 @@ package org.example.project.appinstaller.domain.di
 import org.example.project.appinstaller.domain.ClearCacheUseCase
 import org.example.project.appinstaller.domain.ClearCredentialsUseCase
 import org.example.project.appinstaller.domain.DiscoverDevicesUseCase
+import org.example.project.appinstaller.domain.EnsureAdbServerRunningUseCase
+import org.example.project.appinstaller.domain.GetAdbBinaryUseCase
+import org.example.project.appinstaller.domain.PutAdbBinaryUseCase
 import org.example.project.appinstaller.domain.GetAppConfigFlowUseCase
 import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
@@ -24,4 +27,7 @@ val domainModule = module {
     factoryOf(::DiscoverDevicesUseCase)
     factoryOf(::InstallAppPackageUseCase)
     factoryOf(::ClearCacheUseCase)
+    factoryOf(::GetAdbBinaryUseCase)
+    factoryOf(::PutAdbBinaryUseCase)
+    factoryOf(::EnsureAdbServerRunningUseCase)
 }

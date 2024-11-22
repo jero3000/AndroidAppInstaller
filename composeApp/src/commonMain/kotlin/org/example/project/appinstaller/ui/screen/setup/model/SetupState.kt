@@ -16,5 +16,6 @@ data class SetupState(
     sealed interface Error{
         data class GenericError(val description: String): Error
         data class CredentialsRequired(val host: String): Error
+        data object AdbBinaryNotFound: Error
     }
 }

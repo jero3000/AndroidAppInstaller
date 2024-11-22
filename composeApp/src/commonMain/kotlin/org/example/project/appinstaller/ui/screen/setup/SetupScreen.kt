@@ -12,22 +12,39 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.example.project.appinstaller.model.Credential
 import org.example.project.appinstaller.ui.component.AppRow
 import org.example.project.appinstaller.ui.component.CredentialsDialog
@@ -35,6 +52,7 @@ import org.example.project.appinstaller.ui.component.CustomAlertDialog
 import org.example.project.appinstaller.ui.component.DropDownRow
 import org.example.project.appinstaller.ui.component.VersionRow
 import org.example.project.appinstaller.ui.component.rememberVersionState
+import org.example.project.appinstaller.ui.screen.settings.SettingsScreen
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
@@ -47,6 +65,14 @@ class SetupScreen: Screen {
     @Composable
     override fun Content() {
         val viewModel = koinViewModel<SetupViewModel>()
+        val navigator = LocalNavigator.currentOrThrow
+
+        DisposableEffect(Unit){
+            viewModel.onEvent(SetupEvent.OnStart)
+            onDispose {
+                viewModel.onEvent(SetupEvent.OnStop)
+            }
+        }
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle(
             lifecycleOwner = LocalLifecycleOwner.current
@@ -188,13 +214,45 @@ class SetupScreen: Screen {
                 }
 
                 is SetupState.Error.GenericError -> {
-                    CustomAlertDialog("An error has occurred", it.description, {}) {
+                    CustomAlertDialog("An error has occurred", it.description, "Ok", {}) {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
+                    }
+                }
+
+                SetupState.Error.AdbBinaryNotFound -> {
+                    val annotatedString = buildAnnotatedString {
+                        append("Please install the ")
+                        withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+                            pushStringAnnotation(tag = "URL", annotation = "https://developer.android.com/studio/releases/platform-tools")
+                            append("ADB tool")
+                            pop()
+                        }
+                        append(" or configure the correct ADB path in the settings")
+                    }
+
+
+                    CustomAlertDialog(
+                        "Android Debug Bridge (adb) executable not found",
+                        text = {
+                            ClickableText(
+                                text = annotatedString,
+                                onClick = { offset ->
+                                    annotatedString.getStringAnnotations("URL", offset, offset).firstOrNull()?.let { annotation ->
+                                        // Handle the click, open the URL
+                                        viewModel.onEvent(SetupEvent.OnLinkClicked(annotation.item))
+                                    }
+                                }
+                            )
+                        },
+                        "Go to settings", {}) {
+                        viewModel.onEvent(SetupEvent.OnErrorAck)
+                        navigator.push(SettingsScreen())
                     }
                 }
             }
         }
     }
+
 
     @Composable
     private fun getAppColor(state: SetupPackage.State) = when (state) {

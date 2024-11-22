@@ -2,6 +2,8 @@ package org.example.project.appinstaller.repository.di
 
 import kotlinx.coroutines.Dispatchers
 import org.example.project.appinstaller.platform.di.platformModule
+import org.example.project.appinstaller.repository.adb.AdbRepository
+import org.example.project.appinstaller.repository.adb.AdbRepositoryImpl
 import org.example.project.appinstaller.repository.config.datasource.ConfigurationDataSource
 import org.example.project.appinstaller.repository.config.ConfigurationRepository
 import org.example.project.appinstaller.repository.config.datasource.ConfigurationLocalDataSource
@@ -45,6 +47,7 @@ val repositoryModule = module {
     single<CredentialRepository> { CredentialRepositoryImpl(get()) }
 
     single<ApplicationPreferences> { ApplicationPreferencesImpl("com.jero3000.appinstaller.preferences", get(), Dispatchers.IO) }
+    singleOf(::AdbRepositoryImpl) { bind<AdbRepository>() }
 }
 
 expect val systemDataSourceModule: Module

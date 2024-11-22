@@ -30,8 +30,11 @@ data class RadioEntry(val name: String, val tooltip: String, val key: String)
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun RadioGroup(modifier: Modifier = Modifier, title: String? = null, radioOptions : List<RadioEntry>, onSelected : (option:RadioEntry ) -> Unit) {
-    val (selectedOption, onOptionSelected) = remember { mutableStateOf(radioOptions[0]) }
+fun RadioGroup(modifier: Modifier = Modifier,
+               title: String? = null,
+               radioOptions : List<RadioEntry>,
+               selectedOption: RadioEntry,
+               onSelected : (option:RadioEntry ) -> Unit) {
     // Note that Modifier.selectableGroup() is essential to ensure correct accessibility behavior
     Column(modifier = modifier.selectableGroup()) {
         if(title != null) {
@@ -71,7 +74,6 @@ fun RadioGroup(modifier: Modifier = Modifier, title: String? = null, radioOption
                         .selectable(
                             selected = (entry == selectedOption),
                             onClick = {
-                                onOptionSelected(entry)
                                 onSelected(entry)
                             },
                             role = Role.RadioButton

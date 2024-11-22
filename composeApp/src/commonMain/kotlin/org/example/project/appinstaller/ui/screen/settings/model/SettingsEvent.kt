@@ -1,7 +1,15 @@
 package org.example.project.appinstaller.ui.screen.settings.model
 
-sealed class SettingsEvent{
-    data object OnClearCredentials: SettingsEvent()
-    data object OnClearCache: SettingsEvent()
-    data class OnInstallModeChanged(val mode: String): SettingsEvent()
+import dev.zwander.kotlin.file.IPlatformFile
+import org.example.project.appinstaller.platform.device.Device
+
+sealed class SettingsEvent {
+    data object OnClearCredentials : SettingsEvent()
+    data object OnClearCache : SettingsEvent()
+    data class OnInstallModeChanged(val mode: Device.InstallMode) : SettingsEvent()
+    data class OnAdbBinaryConfigured(val binary: IPlatformFile) : SettingsEvent()
+    data class OnNewAdbHost(val host: String) : SettingsEvent()
+    data class OnNewAdbPort(val port: String) : SettingsEvent()
+    data object OnAdbHostConfirmed : SettingsEvent()
+    data object OnAdbPortConfirmed : SettingsEvent()
 }

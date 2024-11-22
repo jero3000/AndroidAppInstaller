@@ -2,6 +2,8 @@ package org.example.project.appinstaller.ui.screen.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.DisposableHandle
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -9,6 +11,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.example.project.appinstaller.domain.DiscoverDevicesUseCase
+import org.example.project.appinstaller.domain.EnsureAdbServerRunningUseCase
 import org.example.project.appinstaller.domain.GetAppConfigFlowUseCase
 import org.example.project.appinstaller.domain.GetAppConfigUseCase
 import org.example.project.appinstaller.domain.GetPackageFileUseCase
@@ -18,11 +21,15 @@ import org.example.project.appinstaller.domain.StoreCredentialsUseCase
 import org.example.project.appinstaller.model.BuildVariant
 import org.example.project.appinstaller.model.Settings
 import org.example.project.appinstaller.model.exception.CredentialsRequiredException
+import org.example.project.appinstaller.platform.intent.BrowserLauncher
 import org.example.project.appinstaller.repository.preferences.ApplicationPreferences
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
 import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class SetupViewModel(
     private val getAppConfigFlow : GetAppConfigFlowUseCase,
@@ -32,7 +39,9 @@ class SetupViewModel(
     private val storeCredential: StoreCredentialsUseCase,
     private val preferences: ApplicationPreferences,
     private val discoverDevices: DiscoverDevicesUseCase,
-    private val installPackage: InstallAppPackageUseCase
+    private val installPackage: InstallAppPackageUseCase,
+    private val ensureAdbServerRunning: EnsureAdbServerRunningUseCase,
+    private val browserLauncher: BrowserLauncher
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
     val uiState: StateFlow<SetupState> = _uiState.stateIn(
@@ -40,8 +49,10 @@ class SetupViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SetupState()
     )
+    private var scanJob : Job? = null
+    private var configurationLoaded: Continuation<Unit>? = null
 
-    init{
+    init {
         viewModelScope.launch { //Handles the app configuration loading
             getAppConfigFlow().collect{ appConfigResult ->
                 appConfigResult.getOrNull()?.let { appConfig ->
@@ -49,21 +60,36 @@ class SetupViewModel(
                         SetupState(appConfig.projects.map { it.name })
                     }
                     readPreferences()
+                    configurationLoaded?.resume(Unit)
                 } ?: run {
                     //Notify the error loading the app config
                     appConfigResult.exceptionOrNull()?.let { notifyGenericError(it) }
                 }
             }
         }
-        viewModelScope.launch { //Handles the Android device discovery
-            discoverDevices().collect{ devices ->
-                _uiState.update { it.copy(devices = devices) }
-            }
-        }
     }
 
     fun onEvent(event: SetupEvent) {
         when(event){
+            is SetupEvent.OnStart -> {
+                scanJob = viewModelScope.launch { //Handles the Android device discovery
+                    if(configurationLoaded == null) {
+                        //Waits for configuration loaded to start the devices discovery
+                        suspendCoroutine { continuation ->
+                            configurationLoaded = continuation
+                        }
+                    }
+                    ensureAdbServerRunning().exceptionOrNull()?.let {
+                        _uiState.update { it.copy(error = SetupState.Error.AdbBinaryNotFound) }
+                    }
+                    discoverDevices().collect{ devices ->
+                        _uiState.update { it.copy(devices = devices) }
+                    }
+                }
+            }
+            is SetupEvent.OnStop -> {
+                scanJob?.cancel()
+            }
             is SetupEvent.OnDownloadClicked -> {
                 println("Init download for version R${uiState.value.selectedVersion?.major}." +
                         "${uiState.value.selectedVersion?.minor}." +
@@ -102,6 +128,9 @@ class SetupViewModel(
                 _uiState.value.selectedVersion?.let {
                     startDownload(it)
                 }
+            }
+            is SetupEvent.OnLinkClicked -> {
+                browserLauncher.launchUrl(event.link)
             }
         }
     }
