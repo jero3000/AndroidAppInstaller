@@ -9,7 +9,5 @@ sealed class SettingsEvent {
     data class OnInstallModeChanged(val mode: Device.InstallMode) : SettingsEvent()
     data class OnAdbBinaryConfigured(val binary: IPlatformFile) : SettingsEvent()
     data class OnNewAdbHost(val host: String) : SettingsEvent()
-    data class OnNewAdbPort(val port: String) : SettingsEvent()
-    data object OnAdbHostConfirmed : SettingsEvent()
-    data object OnAdbPortConfirmed : SettingsEvent()
+    data class OnNewAdbPort(val port: Int) : SettingsEvent()
 }

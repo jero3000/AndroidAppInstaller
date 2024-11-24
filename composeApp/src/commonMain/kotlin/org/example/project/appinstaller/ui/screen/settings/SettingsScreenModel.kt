@@ -21,25 +21,32 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
                           private val putAdbBinary: PutAdbBinaryUseCase): StateScreenModel<SettingsScreenModel.State>(State()) {
 
     data class State(
+        val isLoading: Boolean = true,
         val adbBinaryPath: String = "Adb binary cannot be found automatically",
         val installMode : Device.InstallMode = Device.InstallMode.NORMAL,
-        val adbHost : String = "",
-        val adbPort : String = ""
+        val adbHost : String = Defaults.ADB_HOST,
+        val adbPort : Int = Defaults.ADB_PORT
     )
 
     init {
         screenModelScope.launch {
+            println("init")
             getAdbBinary().getOrNull()?.getAbsolutePath()?.let { path ->
-                mutableState.update { it.copy(adbBinaryPath = path) }
+                mutableState.update { it.copy(adbBinaryPath = path ) }
             }
+
             preferences.getString(Settings.INSTALL_MODE.key)?.let { mode ->
                 mutableState.update { state -> state.copy(installMode = Device.InstallMode.entries.first { it.key == mode }) }
             }
-            val host = preferences.getString(Settings.ADB_HOST.key) ?: Defaults.ADB_HOST
-            mutableState.update { it.copy(adbHost = host ) }
 
-            val port = preferences.getInt(Settings.ADB_PORT.key) ?: Defaults.ADB_PORT
-            mutableState.update { it.copy(adbPort = port.toString()) }
+            preferences.getString(Settings.ADB_HOST.key)?.let { host ->
+                mutableState.update { it.copy(adbHost = host) }
+            }
+
+            preferences.getInt(Settings.ADB_PORT.key)?.let { port ->
+                mutableState.update { it.copy(adbPort = port) }
+            }
+            mutableState.update { it.copy(isLoading = false) }
         }
     }
 
@@ -63,19 +70,14 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
             }
             is SettingsEvent.OnNewAdbHost -> {
                 mutableState.update { it.copy(adbHost = event.host) }
+                screenModelScope.launch {
+                    preferences.putString(Settings.ADB_HOST.key, event.host)
+                }
             }
             is SettingsEvent.OnNewAdbPort -> {
                 mutableState.update { it.copy(adbPort = event.port) }
-            }
-
-            SettingsEvent.OnAdbHostConfirmed -> screenModelScope.launch {
-                state.value.adbHost.takeIf { it.isNotBlank() }?.let {
-                    preferences.putString(Settings.ADB_HOST.key, state.value.adbHost)
-                }
-            }
-            SettingsEvent.OnAdbPortConfirmed -> screenModelScope.launch {
-                state.value.adbPort.toIntOrNull()?.takeIf { it > 0 }?.let {
-                    preferences.putInt(Settings.ADB_PORT.key, it)
+                screenModelScope.launch {
+                    preferences.putInt(Settings.ADB_PORT.key, event.port)
                 }
             }
         }

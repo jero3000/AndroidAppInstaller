@@ -48,73 +48,86 @@ class SettingsScreen : Screen{
         val state by screenModel.state.collectAsState()
 
         val navigator = LocalNavigator.currentOrThrow
-        Column {
-            TextButton( modifier =  Modifier.padding(start = 5.dp), onClick = {
-                navigator.popUntilRoot()
-            }) {
-                Text("< back")
-            }
+        if(!state.isLoading) {
+            Column {
+                TextButton(modifier = Modifier.padding(start = 5.dp), onClick = {
+                    navigator.popUntilRoot()
+                }) {
+                    Text("< back")
+                }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                val coroutineScope = rememberCoroutineScope()
-                FilePicker(modifier = Modifier.padding(top = 10.dp, bottom = 20.dp),
-                    "Adb binary",
-                    state.adbBinaryPath){
-                    coroutineScope.launch {
-                        FileKit.pickFile(
-                            mode = PickerMode.Single,
-                            title = "Select the Adb binary executable",
-                        )?.toKmpFile()?.let {
-                            screenModel.onEvent(SettingsEvent.OnAdbBinaryConfigured(it))
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    val coroutineScope = rememberCoroutineScope()
+                    FilePicker(
+                        modifier = Modifier.padding(top = 10.dp, bottom = 20.dp),
+                        "Adb binary",
+                        state.adbBinaryPath
+                    ) {
+                        coroutineScope.launch {
+                            FileKit.pickFile(
+                                mode = PickerMode.Single,
+                                title = "Select the Adb binary executable",
+                            )?.toKmpFile()?.let {
+                                screenModel.onEvent(SettingsEvent.OnAdbBinaryConfigured(it))
+                            }
                         }
                     }
-                }
-                Row(modifier = Modifier.padding(bottom = 20.dp)) {
-                    TextField(
-                        modifier = Modifier.width(200.dp).onFocusChanged { state ->
-                            if(!state.isFocused){
-                                screenModel.onEvent(SettingsEvent.OnAdbHostConfirmed)
-                            }
-                        },
-                        value = state.adbHost,
-                        onValueChange = { screenModel.onEvent(SettingsEvent.OnNewAdbHost(it)) },
-                        label = { Text("Adb server host", style = MaterialTheme.typography.labelSmall) },
-                        isError = state.adbHost.isBlank(),
-                        singleLine = true
-                    )
-                    TextField(
-                        modifier = Modifier.width(200.dp).padding(start = 10.dp).onFocusChanged {
-                            if(!it.isFocused){
-                                screenModel.onEvent(SettingsEvent.OnAdbPortConfirmed)
-                            }
-                        },
-                        value = state.adbPort,
-                        onValueChange = { screenModel.onEvent(SettingsEvent.OnNewAdbPort(it)) },
-                        label = { Text("Adb server port", style = MaterialTheme.typography.labelSmall) },
-                        isError = state.adbPort.toIntOrNull()?.let { it <= 0 } ?: true,
-                        singleLine = true
-                    )
-                }
-                val options = provideInstallationModes()
-                RadioGroup(modifier = Modifier.width(250.dp)
-                    .clip(RoundedCornerShape(5.dp))
-                    .background(Color.LightGray),
-                    title = "Install mode",
-                    selectedOption = options.first{ it.key == state.installMode.key },
-                    radioOptions = options
-                ){ mode ->
-                    val installMode = Device.InstallMode.entries.first{ it.key == mode.key }
-                    screenModel.onEvent(SettingsEvent.OnInstallModeChanged(installMode))
-                }
-                Row(modifier = Modifier.padding(top = 20.dp)){
-                    AnimatedButton(text = "Clear credentials") {
-                        screenModel.onEvent(SettingsEvent.OnClearCredentials)
+                    Row(modifier = Modifier.padding(bottom = 20.dp)) {
+                        val (host, onHostChanged) = remember { mutableStateOf(state.adbHost) }
+                        val (port, onPortChanged) = remember { mutableStateOf(state.adbPort.toString()) }
+                        TextField(
+                            modifier = Modifier.width(200.dp).onFocusChanged { state ->
+                                if (!state.isFocused && host.isNotBlank()) {
+                                    screenModel.onEvent(SettingsEvent.OnNewAdbHost(host))
+                                }
+                            },
+                            value = host,
+                            onValueChange = { onHostChanged(it) },
+                            label = { Text("Adb server host", style = MaterialTheme.typography.labelSmall) },
+                            isError = host.isBlank(),
+                            singleLine = true
+                        )
+                        TextField(
+                            modifier = Modifier.width(200.dp).padding(start = 10.dp)
+                                .onFocusChanged {
+                                    if (!it.isFocused) {
+                                        port.toIntOrNull()?.let { portNumber ->
+                                            screenModel.onEvent(SettingsEvent.OnNewAdbPort(portNumber))
+                                        }
+                                    }
+                                },
+                            value = port,
+                            onValueChange = { onPortChanged(it) },
+                            label = { Text("Adb server port", style = MaterialTheme.typography.labelSmall) },
+                            isError = port.toIntOrNull()?.let { it <= 0 } ?: true,
+                            singleLine = true
+                        )
                     }
-                    AnimatedButton(modifier = Modifier.padding(start = 10.dp), text = "Clear cache") {
-                        screenModel.onEvent(SettingsEvent.OnClearCache)
+                    val options = provideInstallationModes()
+                    RadioGroup(
+                        modifier = Modifier.width(250.dp)
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(Color.LightGray),
+                        title = "Install mode",
+                        selectedOption = options.first { it.key == state.installMode.key },
+                        radioOptions = options
+                    ) { mode ->
+                        val installMode = Device.InstallMode.entries.first { it.key == mode.key }
+                        screenModel.onEvent(SettingsEvent.OnInstallModeChanged(installMode))
+                    }
+                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                        AnimatedButton(text = "Clear credentials") {
+                            screenModel.onEvent(SettingsEvent.OnClearCredentials)
+                        }
+                        AnimatedButton(
+                            modifier = Modifier.padding(start = 10.dp),
+                            text = "Clear cache"
+                        ) {
+                            screenModel.onEvent(SettingsEvent.OnClearCache)
+                        }
                     }
                 }
             }
