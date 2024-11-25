@@ -15,7 +15,7 @@ class DiscoverDevicesUseCase(private val deviceManager: DeviceManager) {
                 val manufacturer = it.getManufacturer().getOrNull()
                 val model = it.getModel().getOrNull()
                 if (serial != null && manufacturer != null && model != null) {
-                    AndroidDevice(serial, "$manufacturer $model")
+                    AndroidDevice(serial, "$manufacturer $model", manufacturer)
                 } else null
             } ?: emptyList()
             scanResult.exceptionOrNull()?.let {
