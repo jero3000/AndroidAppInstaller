@@ -147,6 +147,11 @@ class SetupViewModel(
         }
 
         val packagesSelected = _uiState.value.packages.filter { it.selected }
+        //Maps the manufacturer if applicable
+        val deviceManufacturer = uiState.value.selectedDevice!!.manufacturer.let {
+            variant.deviceMap[it] ?: it
+        }
+        placeHolders[ResolvePackageUrlUseCase.DEVICE_PLACEHOLDER] = deviceManufacturer
         for(app in packagesSelected){
             val appPackage = variant.packages.first{it.packageName == app.packageName}
             val url = resolveUrl(variant, appPackage, placeHolders)

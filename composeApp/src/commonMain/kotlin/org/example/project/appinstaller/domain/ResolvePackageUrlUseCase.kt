@@ -24,5 +24,6 @@ class ResolvePackageUrlUseCase {
         const val MINOR_PLACEHOLDER = "minor"
         const val MICRO_PLACEHOLDER = "micro"
         const val BUILD_PLACEHOLDER = "build"
+        const val DEVICE_PLACEHOLDER = "device"
     }
 }

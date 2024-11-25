@@ -6,6 +6,9 @@
         {
           "name":"variant1",
           "location":"http://www.example1.com",
+          "deviceMap": {
+            "key": "value"
+          },
           "packages":[
             {
               "name":"app1",

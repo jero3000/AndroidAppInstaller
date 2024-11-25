@@ -45,6 +45,7 @@ class ConfigurationLocalDataSourceTest{
         assertEquals(1,  appConfig.projects.size)
         assertEquals("project", appConfig.projects.first().name)
         assertEquals(2, appConfig.projects.first().buildVariants.size)
+        assertEquals(1, appConfig.projects.first().buildVariants.first().deviceMap.size)
         assertEquals(2, appConfig.projects.first().buildVariants.first().packages.size)
     }
 

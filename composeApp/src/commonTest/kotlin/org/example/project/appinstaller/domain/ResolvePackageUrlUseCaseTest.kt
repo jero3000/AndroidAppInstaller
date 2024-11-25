@@ -10,7 +10,7 @@ class ResolvePackageUrlUseCaseTest{
     @Test
     fun `resolve url where the location ends with a slash`(){
         val resolver = ResolvePackageUrlUseCase()
-        val buildVariant = BuildVariant("name", "https://www.example.com/", emptyList())
+        val buildVariant = BuildVariant("name", "https://www.example.com/", emptyMap(), emptyList())
         val appPackage = AppPackage("name", "packageName", "releaseR{major}.{minor}.{micro}_{build}.apk")
         val placeholders = mapOf(
             ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to "1",
@@ -25,7 +25,7 @@ class ResolvePackageUrlUseCaseTest{
     @Test
     fun `resolve url where the location ends without a slash`(){
         val resolver = ResolvePackageUrlUseCase()
-        val buildVariant = BuildVariant("name", "https://www.example.com", emptyList())
+        val buildVariant = BuildVariant("name", "https://www.example.com", emptyMap(), emptyList())
         val appPackage = AppPackage("name", "packageName", "releaseR{major}.{minor}.{micro}_{build}.apk")
         val placeholders = mapOf(
             ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to "1",

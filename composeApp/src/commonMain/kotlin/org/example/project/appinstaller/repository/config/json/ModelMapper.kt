@@ -14,6 +14,7 @@ fun AppPackageDto.toAppPackage() =  AppPackage(
 fun BuildVariantDto.toBuildVariant() = BuildVariant(
     name,
     location,
+    deviceMap,
     packages.map { it.toAppPackage() }
 )
 

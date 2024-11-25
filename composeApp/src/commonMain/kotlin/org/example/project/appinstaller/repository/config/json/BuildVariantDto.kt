@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class BuildVariantDto(
     val name: String,
     val location: String,
+    val deviceMap: Map<String, String> = emptyMap(),
     val packages: List<AppPackageDto>
 )
