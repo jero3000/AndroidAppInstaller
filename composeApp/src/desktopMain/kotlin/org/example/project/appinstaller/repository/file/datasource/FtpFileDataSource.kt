@@ -48,6 +48,7 @@ actual class FtpFileDataSource(): FileDataSource {
                 ftp.setFileType(FTP.BINARY_FILE_TYPE)
                 ftp.enterLocalPassiveMode()
 
+                println("Getting file: $path")
                 val success =
                     BufferedOutputStream(FileOutputStream(targetFilePath)).use { outputStream ->
                         ftp.retrieveFile(path, outputStream)

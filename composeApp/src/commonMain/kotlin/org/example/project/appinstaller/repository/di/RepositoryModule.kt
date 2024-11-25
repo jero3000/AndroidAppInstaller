@@ -37,7 +37,7 @@ val repositoryModule = module {
     factory<FileDataSource> {
         FileDataSourceResolver(listOf(
             get<FileDataSource>(named("ftp"))
-        ))
+        ), get())
     } withOptions {
         named("resolver")
     }

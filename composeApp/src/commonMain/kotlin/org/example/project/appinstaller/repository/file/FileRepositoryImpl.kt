@@ -17,12 +17,14 @@ class FileRepositoryImpl(private val dataSource: FileDataSource,
 ): FileRepository {
 
     override fun getFile(url: String): IPlatformFile? {
-        val fileName = uriParser.getFilename(url)
-        val tmpDir = platformFileSystem.getTempDirectory()
-        val fileSeparator = platformFileSystem.getFileSeparator()
-        val filePath = tmpDir.takeIf { it.endsWith(fileSeparator) }
-            ?.let { it + TEMP_DIR_NAME + fileSeparator + fileName } ?: (tmpDir + fileSeparator + TEMP_DIR_NAME + fileSeparator + fileName)
-        return fileUtils.getFileFromPath(filePath, false)?.takeIf { it.getExists() }
+        return kotlin.runCatching { uriParser.getFilename(url) }.getOrNull()?.let { fileName ->
+            val tmpDir = platformFileSystem.getTempDirectory()
+            val fileSeparator = platformFileSystem.getFileSeparator()
+            val filePath = tmpDir.takeIf { it.endsWith(fileSeparator) }
+                ?.let { it + TEMP_DIR_NAME + fileSeparator + fileName }
+                ?: (tmpDir + fileSeparator + TEMP_DIR_NAME + fileSeparator + fileName)
+            fileUtils.getFileFromPath(filePath, false)?.takeIf { it.getExists() }
+        }
     }
 
     override suspend fun fetchFile(url: String): Result<IPlatformFile> {
