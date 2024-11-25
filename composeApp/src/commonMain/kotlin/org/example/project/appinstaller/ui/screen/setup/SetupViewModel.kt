@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.example.project.appinstaller.domain.DiscoverDevicesUseCase
 import org.example.project.appinstaller.domain.EnsureAdbServerRunningUseCase
 import org.example.project.appinstaller.domain.GetAppConfigFlowUseCase
@@ -51,6 +53,7 @@ class SetupViewModel(
     )
     private var scanJob : Job? = null
     private var configurationLoaded: Continuation<Unit>? = null
+    private val mutex = Mutex()
 
     init {
         viewModelScope.launch { //Handles the app configuration loading
@@ -61,6 +64,9 @@ class SetupViewModel(
                     }
                     readPreferences()
                     configurationLoaded?.resume(Unit)
+                    mutex.withLock {
+                        _uiState.update { it.copy(isLoading = false) }
+                    }
                 } ?: run {
                     //Notify the error loading the app config
                     appConfigResult.exceptionOrNull()?.let { notifyGenericError(it) }
@@ -73,7 +79,8 @@ class SetupViewModel(
         when(event){
             is SetupEvent.OnStart -> {
                 scanJob = viewModelScope.launch { //Handles the Android device discovery
-                    if(configurationLoaded == null) {
+                    val isLoading = mutex.withLock { _uiState.value.isLoading }
+                    if(isLoading) {
                         //Waits for configuration loaded to start the devices discovery
                         suspendCoroutine { continuation ->
                             configurationLoaded = continuation
