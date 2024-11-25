@@ -35,7 +35,11 @@ class JadbDevice(private val jadb: JadbDevice, private val ioContext: CoroutineC
                     pm.installWithOptions(File(app.packageFile!!.getPath()), listOf(ALLOW_VERSION_DOWNGRADE))
                 }
                 Device.InstallMode.CLEAN -> runSecure(timeMillis = INSTALL_TIMEOUT_MS) {
-                    pm.uninstall(se.vidstige.jadb.managers.Package(app.packageName))
+                    kotlin.runCatching {
+                        pm.uninstall(se.vidstige.jadb.managers.Package(app.packageName))
+                    }.exceptionOrNull()?.let {
+                        println("Error uninstalling ${app.name}: ${it.stackTraceToString()}")
+                    }
                     pm.install(File(app.packageFile!!.getPath()))
                 }
             }
