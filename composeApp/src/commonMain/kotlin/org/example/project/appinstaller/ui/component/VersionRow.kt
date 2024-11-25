@@ -13,14 +13,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.unit.dp
 
 @Stable
-class VersionState{
-    var major by mutableStateOf("")
-    var minor by mutableStateOf("")
-    var micro by mutableStateOf("")
-    var build by mutableStateOf("")
+class VersionState(major: String, minor: String, micro: String, build: String){
+
+    var major by mutableStateOf(major)
+    var minor by mutableStateOf(minor)
+    var micro by mutableStateOf(micro)
+    var build by mutableStateOf(build)
 
     val versionValid: Boolean
         get() =
@@ -32,50 +34,65 @@ class VersionState{
 }
 
 @Composable
-fun rememberVersionState() = remember { VersionState() }
+fun rememberVersionState(major: String, minor: String, micro: String, build: String) = remember { VersionState(major, minor, micro, build) }
+
+@Composable
+fun rememberVersionState() = remember { VersionState("", "", "", "") }
 
 @Composable
 fun VersionRow(modifier: Modifier = Modifier, versionState: VersionState = rememberVersionState(), onVersionEntered: () -> Unit = {}){
     Row(modifier = modifier) {
         TextField(
-            modifier = Modifier.width(80.dp),
+            modifier = Modifier.width(80.dp).onFocusChanged {
+                if(!it.isFocused && versionState.versionValid){
+                    onVersionEntered()
+                }
+            },
             value = versionState.major,
             onValueChange = { value ->
                 versionState.major = value
-                onVersionEntered()
             },
             isError = !versionState.versionValid,
             label = { Text("Major", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
         TextField(
-            modifier = Modifier.width(80.dp).padding(start = 10.dp),
+            modifier = Modifier.width(80.dp).padding(start = 10.dp).onFocusChanged {
+                if(!it.isFocused && versionState.versionValid){
+                    onVersionEntered()
+                }
+            },
             value = versionState.minor,
             onValueChange = { value ->
                 versionState.minor = value
-                onVersionEntered()
             },
             isError = !versionState.versionValid,
             label = { Text("Minor", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
         TextField(
-            modifier = Modifier.width(80.dp).padding(start = 10.dp),
+            modifier = Modifier.width(80.dp).padding(start = 10.dp).onFocusChanged {
+                if(!it.isFocused && versionState.versionValid){
+                    onVersionEntered()
+                }
+            },
             value = versionState.micro,
             onValueChange = { value ->
                 versionState.micro = value
-                onVersionEntered()
             },
             isError = !versionState.versionValid,
             label = { Text("Micro", style = MaterialTheme.typography.labelSmall) },
             singleLine = true
         )
         TextField(
-            modifier = Modifier.width(80.dp).padding(start = 10.dp),
+            modifier = Modifier.width(80.dp).padding(start = 10.dp).onFocusChanged {
+                if(!it.isFocused && versionState.versionValid){
+                    onVersionEntered()
+                }
+            },
             value = versionState.build,
             onValueChange = { value ->
                 versionState.build = value
-                onVersionEntered()
             },
             isError = !versionState.versionValid,
             label = { Text("Build", style = MaterialTheme.typography.labelSmall) },

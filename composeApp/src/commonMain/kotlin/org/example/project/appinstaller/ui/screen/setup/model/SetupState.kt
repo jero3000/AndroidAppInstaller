@@ -3,6 +3,7 @@ package org.example.project.appinstaller.ui.screen.setup.model
 import org.example.project.appinstaller.model.AndroidDevice
 
 data class SetupState(
+    val isLoading: Boolean = true,
     val projects : List<String> = emptyList(),
     val selectedProject: String? = null,
     val targets : List<String> = emptyList(),

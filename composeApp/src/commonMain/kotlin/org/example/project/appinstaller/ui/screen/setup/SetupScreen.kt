@@ -67,132 +67,142 @@ class SetupScreen: Screen {
         val viewModel = koinViewModel<SetupViewModel>()
         val navigator = LocalNavigator.currentOrThrow
 
-        DisposableEffect(Unit){
-            viewModel.onEvent(SetupEvent.OnStart)
-            onDispose {
-                viewModel.onEvent(SetupEvent.OnStop)
-            }
-        }
-
         val uiState by viewModel.uiState.collectAsStateWithLifecycle(
             lifecycleOwner = LocalLifecycleOwner.current
         )
 
-        if(uiState.projects.isEmpty()){
-            Column(
-                modifier = Modifier.padding(20.dp).fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-
-            ) {
-                Text(text = "Application configuration required. Please load a configuration file: File > load configuration...",
-                    textAlign = TextAlign.Center,
-                    fontSize = 24.sp)
+        if(!uiState.isLoading) {
+            DisposableEffect(Unit) {
+                viewModel.onEvent(SetupEvent.OnStart)
+                onDispose {
+                    viewModel.onEvent(SetupEvent.OnStop)
+                }
             }
-        } else {
-            Column(
-                modifier = Modifier.padding(20.dp).fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Row{
-                    DropDownRow(
-                        modifier = Modifier.padding(end = 10.dp),
-                        label = "Project",
-                        options = uiState.projects,
-                        default = uiState.selectedProject ?: "Not set"
-                    ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
-                    DropDownRow(
-                        label = "Target",
-                        options = uiState.targets,
-                        default = uiState.selectedTarget ?: "Not set"
-                    ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
-                }
 
-                val versionState = rememberVersionState()
-                versionState.major = uiState.selectedVersion?.major ?: ""
-                versionState.minor = uiState.selectedVersion?.minor ?: ""
-                versionState.micro = uiState.selectedVersion?.micro ?: ""
-                versionState.build = uiState.selectedVersion?.build ?: ""
-                VersionRow(modifier = Modifier.padding(top = 20.dp), versionState){
-                    viewModel.onEvent(SetupEvent.OnVersionEntered(
-                        SetupVersion(
-                            versionState.major.takeIf { it.isNotBlank() },
-                            versionState.minor.takeIf { it.isNotBlank() },
-                            versionState.micro.takeIf { it.isNotBlank() },
-                            versionState.build.takeIf { it.isNotBlank() }
-                        )
-                    ))
-                }
+            if (uiState.projects.isEmpty()) {
+                Column(
+                    modifier = Modifier.padding(20.dp).fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
 
-                DropDownRow(
-                    modifier = Modifier.padding(top = 20.dp),
-                    label = "Device",
-                    options = uiState.devices.map { it.label },
-                    default = uiState.selectedDevice?.label ?: "Not set"
-                ) { labelSelected ->
-                    uiState.devices.firstOrNull { it.label == labelSelected }?.let {
-                        viewModel.onEvent(SetupEvent.OnDeviceSelected(it))
-                    }
-                }
-
-                Row(modifier = Modifier.padding(top = 20.dp, bottom = 14.dp)) {
-                    Button(
-                        colors = ButtonDefaults.buttonColors(),
-                        onClick = { viewModel.onEvent(SetupEvent.OnDownloadClicked) },
-                        enabled = uiState.selectedProject != null && uiState.selectedTarget != null && versionState.versionValid
-                    ) {
-                        Text("Download")
-                    }
-                    Button(
-                        modifier = Modifier.padding(start = 10.dp),
-                        colors = ButtonDefaults.buttonColors(),
-                        onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
-                        enabled = uiState.selectedDevice != null && uiState.packages.filter { it.selected }
-                            .all { it.state == SetupPackage.State.Downloaded }
-                    ) {
-                        Text("Install")
-                    }
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(5.dp))
-                        .background(Color.LightGray)
-                        .padding(6.dp),
-                    horizontalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Application packages",
-                        style = MaterialTheme.typography.titleMedium,
+                        text = "Application configuration required. Please load a configuration file: File > load configuration...",
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp
                     )
                 }
-                if(uiState.selectedProject != null && uiState.selectedTarget != null) {
-                    LazyColumn(
-                        modifier = Modifier.wrapContentSize().padding(top = 10.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        content = {
-                            items(uiState.packages) { appPackage ->
-                                AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
-                                    appName = appPackage.name,
-                                    color = getAppColor(appPackage.state),
-                                    checked = appPackage.selected,
-                                    state = getAppState(appPackage.state),
-                                    isTransient = isTransientState(appPackage.state),
-                                    onCheckedChanged = { checked ->
-                                        viewModel.onEvent(
-                                            SetupEvent.OnSetupPackageChanged(
-                                                appPackage.packageName,
-                                                checked
-                                            )
-                                        )
-                                    }
-                                )
-                            }
-                        }
+            } else {
+                Column(
+                    modifier = Modifier.padding(20.dp).fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row {
+                        DropDownRow(
+                            modifier = Modifier.padding(end = 10.dp),
+                            label = "Project",
+                            options = uiState.projects,
+                            default = uiState.selectedProject ?: "Not set"
+                        ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
+                        DropDownRow(
+                            label = "Target",
+                            options = uiState.targets,
+                            default = uiState.selectedTarget ?: "Not set"
+                        ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+                    }
+
+                    val versionState = rememberVersionState(
+                        uiState.selectedVersion?.major ?: "",
+                        uiState.selectedVersion?.minor ?: "",
+                        uiState.selectedVersion?.micro ?: "",
+                        uiState.selectedVersion?.build ?: ""
                     )
-                } else {
-                    Text(modifier = Modifier.padding(top = 20.dp),
-                        text = "You must select at least a project and a target in order to configure the application packages")
+                    VersionRow(modifier = Modifier.padding(top = 20.dp), versionState) {
+                        viewModel.onEvent(SetupEvent.OnVersionEntered(
+                            SetupVersion(
+                                versionState.major,
+                                versionState.minor,
+                                versionState.micro,
+                                versionState.build.takeIf { it.isNotBlank() }
+                            )
+                        ))
+                    }
+
+                    DropDownRow(
+                        modifier = Modifier.padding(top = 20.dp),
+                        label = "Device",
+                        options = uiState.devices.map { it.label },
+                        default = uiState.selectedDevice?.label ?: "Not set"
+                    ) { labelSelected ->
+                        uiState.devices.firstOrNull { it.label == labelSelected }?.let {
+                            viewModel.onEvent(SetupEvent.OnDeviceSelected(it))
+                        }
+                    }
+
+                    Row(modifier = Modifier.padding(top = 20.dp, bottom = 14.dp)) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(),
+                            onClick = { viewModel.onEvent(SetupEvent.OnDownloadClicked) },
+                            enabled = uiState.selectedProject != null
+                                    && uiState.selectedTarget != null
+                                    && versionState.versionValid
+                                    && uiState.selectedDevice != null
+                        ) {
+                            Text("Download")
+                        }
+                        Button(
+                            modifier = Modifier.padding(start = 10.dp),
+                            colors = ButtonDefaults.buttonColors(),
+                            onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
+                            enabled = uiState.selectedDevice != null && uiState.packages.filter { it.selected }
+                                .all { it.state == SetupPackage.State.Downloaded }
+                        ) {
+                            Text("Install")
+                        }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(5.dp))
+                            .background(Color.LightGray)
+                            .padding(6.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Application packages",
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+                    }
+                    if (uiState.selectedProject != null && uiState.selectedTarget != null) {
+                        LazyColumn(
+                            modifier = Modifier.wrapContentSize().padding(top = 10.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            content = {
+                                items(uiState.packages) { appPackage ->
+                                    AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
+                                        appName = appPackage.name,
+                                        color = getAppColor(appPackage.state),
+                                        checked = appPackage.selected,
+                                        state = getAppState(appPackage.state),
+                                        isTransient = isTransientState(appPackage.state),
+                                        onCheckedChanged = { checked ->
+                                            viewModel.onEvent(
+                                                SetupEvent.OnSetupPackageChanged(
+                                                    appPackage.packageName,
+                                                    checked
+                                                )
+                                            )
+                                        }
+                                    )
+                                }
+                            }
+                        )
+                    } else {
+                        Text(
+                            modifier = Modifier.padding(top = 20.dp),
+                            text = "You must select at least a project and a target in order to configure the application packages"
+                        )
+                    }
                 }
             }
         }

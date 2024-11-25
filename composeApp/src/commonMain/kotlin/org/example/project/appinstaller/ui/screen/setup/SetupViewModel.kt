@@ -57,7 +57,7 @@ class SetupViewModel(
             getAppConfigFlow().collect{ appConfigResult ->
                 appConfigResult.getOrNull()?.let { appConfig ->
                     _uiState.update { _ ->
-                        SetupState(appConfig.projects.map { it.name })
+                        SetupState(projects = appConfig.projects.map { it.name })
                     }
                     readPreferences()
                     configurationLoaded?.resume(Unit)
@@ -138,9 +138,9 @@ class SetupViewModel(
     private suspend fun startDownload(version: SetupVersion) {
         val variant = getBuildVariant()
         val placeHolders = mutableMapOf(
-            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major!!,
-            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to version.minor!!,
-            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to version.micro!!
+            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major,
+            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to version.minor,
+            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to version.micro
         )
         version.build?.let { build ->
             placeHolders.put(ResolvePackageUrlUseCase.BUILD_PLACEHOLDER, build)
