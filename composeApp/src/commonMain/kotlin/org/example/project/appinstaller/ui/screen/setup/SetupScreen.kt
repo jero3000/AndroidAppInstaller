@@ -19,9 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,17 +32,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.example.project.appinstaller.model.Credential
 import org.example.project.appinstaller.ui.component.AppRow
 import org.example.project.appinstaller.ui.component.CredentialsDialog
@@ -56,7 +47,7 @@ import org.example.project.appinstaller.ui.screen.settings.SettingsScreen
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
-import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
+import org.example.project.appinstaller.model.AppVersion
 import org.example.project.appinstaller.ui.theme.CustomTheme
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -119,7 +110,7 @@ class SetupScreen: Screen {
                     )
                     VersionRow(modifier = Modifier.padding(top = 20.dp), versionState) {
                         viewModel.onEvent(SetupEvent.OnVersionEntered(
-                            SetupVersion(
+                            AppVersion(
                                 versionState.major,
                                 versionState.minor,
                                 versionState.micro,

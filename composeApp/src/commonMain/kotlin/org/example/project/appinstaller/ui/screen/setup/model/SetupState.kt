@@ -1,6 +1,7 @@
 package org.example.project.appinstaller.ui.screen.setup.model
 
 import org.example.project.appinstaller.model.AndroidDevice
+import org.example.project.appinstaller.model.AppVersion
 
 data class SetupState(
     val isLoading: Boolean = true,
@@ -8,7 +9,7 @@ data class SetupState(
     val selectedProject: String? = null,
     val targets : List<String> = emptyList(),
     val selectedTarget: String? = null,
-    val selectedVersion: SetupVersion? = null,
+    val selectedVersion: AppVersion? = null,
     val devices : List<AndroidDevice> = emptyList(),
     val selectedDevice: AndroidDevice? = null,
     val packages : List<SetupPackage> = emptyList(),

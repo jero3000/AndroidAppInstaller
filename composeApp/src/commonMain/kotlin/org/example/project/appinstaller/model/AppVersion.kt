@@ -1,6 +1,6 @@
-package org.example.project.appinstaller.ui.screen.setup.model
+package org.example.project.appinstaller.model
 
-data class SetupVersion(
+data class AppVersion(
     val major: String,
     val minor: String,
     val micro: String,

@@ -2,7 +2,6 @@ package org.example.project.appinstaller.ui.screen.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,7 +27,7 @@ import org.example.project.appinstaller.repository.preferences.ApplicationPrefer
 import org.example.project.appinstaller.ui.screen.setup.model.SetupEvent
 import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
-import org.example.project.appinstaller.ui.screen.setup.model.SetupVersion
+import org.example.project.appinstaller.model.AppVersion
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -142,26 +141,14 @@ class SetupViewModel(
         }
     }
 
-    private suspend fun startDownload(version: SetupVersion) {
+    private suspend fun startDownload(version: AppVersion) {
         val variant = getBuildVariant()
-        val placeHolders = mutableMapOf(
-            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to version.major,
-            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to version.minor,
-            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to version.micro
-        )
-        version.build?.let { build ->
-            placeHolders.put(ResolvePackageUrlUseCase.BUILD_PLACEHOLDER, build)
-        }
-
         val packagesSelected = _uiState.value.packages.filter { it.selected }
-        //Maps the manufacturer if applicable
-        val deviceManufacturer = uiState.value.selectedDevice!!.manufacturer.let {
-            variant.deviceMap[it] ?: it
-        }
-        placeHolders[ResolvePackageUrlUseCase.DEVICE_PLACEHOLDER] = deviceManufacturer
+        val deviceManufacturer = uiState.value.selectedDevice!!.manufacturer
+
         for(app in packagesSelected){
             val appPackage = variant.packages.first{it.packageName == app.packageName}
-            val url = resolveUrl(variant, appPackage, placeHolders)
+            val url = resolveUrl(variant, appPackage, version, deviceManufacturer)
             updatePackage(app.packageName, SetupPackage.State.Downloading)
             val result = getPackageFile(url)
             if(result.isSuccess){
@@ -279,7 +266,7 @@ class SetupViewModel(
                 preferences.getString(VARIANT_KEY)?.takeIf { variant -> appConfig.projects.first{ it.name == project }.buildVariants.map { it.name }.contains(variant) }
             } else null
             val version = preferences.getString(VERSION_KEY)?.split(".")?.let { version ->
-                SetupVersion(version[0], version[1], version[2], version[3].takeIf { it.isNotEmpty() })
+                AppVersion(version[0], version[1], version[2], version[3].takeIf { it.isNotEmpty() })
             }
             project?.let { selectProject(it) }
             variant?.let { selectTarget(it) }
