@@ -1,0 +1,70 @@
+MIT License
+
+Copyright (c) 2024 Jerónimo Muñoz
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Third-party libraries and licenses
+----------------------------------
+
+kotlin-test (org.jetbrains.kotlinx)
+Apache-2.0 license
+
+lifecycle-viewmodel, lifecycle-runtime-compose (org.jetbrains.androidx.lifecycle)
+Apache-2.0 license
+
+kotlinx-io-core, kotlinx-coroutines-test, kotlinx-serialization-json, kotlinx-datetime, kotlinx-coroutines-swing (org.jetbrains.kotlinx)
+Apache-2.0 license
+
+Koin (io.insert-koin) 4.0.0
+Apache-2.0 license
+
+KMPFile (dev.zwander) 0.6.1
+MIT license
+
+Apache Commons Net (commons-net) 3.11.1
+Apache-2.0 license
+
+multiplatform-settings (com.russhwolf) 1.2.0
+Apache-2.0 license
+
+Ktor (io.ktor) 3.0.0
+Apache-2.0 license
+
+cryptography-kotlin (dev.whyoleg.cryptography) 0.4.0
+Apache-2.0 license
+
+Voyager (cafe.adriel.voyager) 1.1.0-beta02
+MIT license
+
+FileKit (io.github.vinceglb) 0.8.7
+MIT license
+
+appdirs (net.harawata) 1.2.2
+Apache-2.0 license
+
+dadb (dev.mobile) 1.2.8
+Apache-2.0 license
+
+jadb (com.github.vidstige) 1.2.1
+Apache-2.0 license
+
+Mokkery (dev.mokkery) 2.4.0
+Apache-2.0 license
