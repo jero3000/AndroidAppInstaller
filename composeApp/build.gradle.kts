@@ -71,8 +71,8 @@ compose.desktop {
         mainClass = "org.example.project.appinstaller.MainKt"
 
         nativeDistributions {
+            modules("java.instrument", "java.management", "java.prefs", "jdk.security.auth", "jdk.unsupported")
             linux {
-                modules("jdk.security.auth")
                 iconFile.set(project.file("src/desktopMain/resources/installer_icon.png"))
             }
             macOS{
