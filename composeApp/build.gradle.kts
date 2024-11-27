@@ -69,7 +69,8 @@ kotlin {
 compose.desktop {
     application {
         mainClass = "org.example.project.appinstaller.MainKt"
-
+        val appVersion = "1.0.0"
+        jvmArgs += listOf("-DversionName=$appVersion")
         nativeDistributions {
             modules("java.instrument", "java.management", "java.prefs", "jdk.security.auth", "jdk.unsupported")
             linux {
@@ -83,7 +84,7 @@ compose.desktop {
             }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "org.example.project.appinstaller"
-            packageVersion = "1.0.0"
+            packageVersion = appVersion
             description = "Android application installer"
             copyright = "© 2024 Jerónimo Muñoz. MIT license"
             licenseFile.set(project.file("../LICENSE"))

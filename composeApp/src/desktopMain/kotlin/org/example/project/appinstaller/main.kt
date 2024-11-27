@@ -140,7 +140,7 @@ fun main() = application {
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                                 Text(modifier = Modifier.padding(top = 15.dp),
-                                    text = "Version: 1.0.0",
+                                    text = "Version: " + System.getProperty("versionName", "Unknown"),
                                     style = MaterialTheme.typography.bodyMedium
                                 )
                             }
