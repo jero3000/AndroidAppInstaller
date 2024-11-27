@@ -5,6 +5,7 @@ import dev.zwander.kotlin.file.PlatformFile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import kotlinx.io.files.FileNotFoundException
+import net.harawata.appdirs.AppDirsFactory
 import java.io.File
 import java.io.IOException
 import java.net.Socket
@@ -15,10 +16,24 @@ import kotlin.time.Duration.Companion.milliseconds
 class AdbBinaryImpl(private val ioContext: CoroutineContext) : AdbBinary{
 
     override suspend fun searchForBinary(): Result<IPlatformFile> {
-        return findViaWhich().takeIf { it.isSuccess } ?: findViaAndroidHome()
+        return findViaWhich().takeIf { it.isSuccess }
+            ?: findViaAndroidHome().takeIf { it.getOrNull() != null }
+            ?: findViaPaths()
     }
 
-    private suspend fun findViaWhich(): Result<IPlatformFile> = kotlin.runCatching {
+    private fun findViaPaths(): Result<IPlatformFile> = runCatching {
+        val appDirs = AppDirsFactory.getInstance()
+        val adbName = if (isWindows()) "adb.exe" else "adb"
+        val adbFile = File(appDirs.getUserDataDir(null, null, null))
+            .resolve("Android")
+            .resolve("Sdk")
+            .resolve("platform-tools")
+            .resolve(adbName)
+        if (!adbFile.exists()) throw FileNotFoundException("Adb binary cannot be found via filesystem paths")
+        PlatformFile(adbFile)
+    }
+
+    private suspend fun findViaWhich(): Result<IPlatformFile> = runCatching {
         val which = if (isWindows()) "where" else "which"
         val output = withContext(ioContext) {
             val process = ProcessBuilder(which, "adb").start()
@@ -33,7 +48,7 @@ class AdbBinaryImpl(private val ioContext: CoroutineContext) : AdbBinary{
         PlatformFile(file)
     }
 
-    private fun findViaAndroidHome(): Result<IPlatformFile> = kotlin.runCatching {
+    private fun findViaAndroidHome(): Result<IPlatformFile> = runCatching {
         val androidEnvHome = System.getenv("ANDROID_HOME") ?: System.getenv("ANDROID_SDK_ROOT") ?: throw FileNotFoundException("Adb binary cannot be found via Android env variables")
         val adbName = if (isWindows()) "adb.exe" else "adb"
         val adbFile = File(androidEnvHome).resolve("platform-tools").resolve(adbName)
