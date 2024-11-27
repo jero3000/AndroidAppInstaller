@@ -1,5 +1,6 @@
 package org.example.project.appinstaller.domain.di
 
+import org.example.project.appinstaller.domain.CheckAdbServerRunningUseCase
 import org.example.project.appinstaller.domain.ClearCacheUseCase
 import org.example.project.appinstaller.domain.ClearCredentialsUseCase
 import org.example.project.appinstaller.domain.DiscoverDevicesUseCase
@@ -30,4 +31,5 @@ val domainModule = module {
     factoryOf(::GetAdbBinaryUseCase)
     factoryOf(::PutAdbBinaryUseCase)
     factoryOf(::EnsureAdbServerRunningUseCase)
+    factoryOf(::CheckAdbServerRunningUseCase)
 }

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -17,14 +18,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -38,6 +37,7 @@ import org.example.project.appinstaller.ui.component.AnimatedButton
 import org.example.project.appinstaller.ui.component.FilePicker
 import org.example.project.appinstaller.ui.component.RadioEntry
 import org.example.project.appinstaller.ui.component.RadioGroup
+import org.example.project.appinstaller.ui.component.StatusSticker
 import org.example.project.appinstaller.ui.screen.settings.model.SettingsEvent
 
 class SettingsScreen : Screen{
@@ -75,7 +75,7 @@ class SettingsScreen : Screen{
                             }
                         }
                     }
-                    Row(modifier = Modifier.padding(bottom = 20.dp)) {
+                    Row(modifier = Modifier.padding(bottom = 20.dp), verticalAlignment = Alignment.CenterVertically) {
                         val (host, onHostChanged) = remember { mutableStateOf(state.adbHost) }
                         val (port, onPortChanged) = remember { mutableStateOf(state.adbPort.toString()) }
                         TextField(
@@ -105,6 +105,10 @@ class SettingsScreen : Screen{
                             isError = port.toIntOrNull()?.let { it <= 0 } ?: true,
                             singleLine = true
                         )
+                        StatusSticker(modifier = Modifier.size(width = 150.dp, height = 57.dp).padding(start = 10.dp),
+                            okStatusText = "ADB server running",
+                            failStatusText = "ADB server not running",
+                            okStatus = state.adbServerRunning)
                     }
                     val options = provideInstallationModes()
                     RadioGroup(
