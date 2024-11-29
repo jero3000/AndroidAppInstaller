@@ -39,7 +39,7 @@ fun RadioGroup(modifier: Modifier = Modifier,
     Column(modifier = modifier.selectableGroup()) {
         if(title != null) {
             Text(
-                text = "Install mode",
+                text = title,
                 style = MaterialTheme.typography.labelMedium,
                 modifier = Modifier.padding(start = 16.dp, top = 10.dp, bottom = 5.dp)
             )

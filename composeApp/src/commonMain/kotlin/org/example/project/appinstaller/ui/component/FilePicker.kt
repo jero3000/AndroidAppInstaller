@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun FilePicker(modifier: Modifier = Modifier, label: String, filePath : String, onClick : () -> Unit){
+fun FilePicker(modifier: Modifier = Modifier, label: String, filePath : String, buttonText: String, onClick : () -> Unit){
     Row(modifier = modifier.wrapContentWidth().padding(start = 20.dp, end = 20.dp),
         verticalAlignment = Alignment.CenterVertically) {
         TextField(
@@ -29,7 +29,7 @@ fun FilePicker(modifier: Modifier = Modifier, label: String, filePath : String, 
             onClick = {
                 onClick()
             }) {
-            Text("Browse")
+            Text(buttonText)
         }
     }
 }

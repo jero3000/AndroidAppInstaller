@@ -1,5 +1,27 @@
 package org.example.project.appinstaller.ui.screen.setup
 
+import androidappinstaller.composeapp.generated.resources.Res
+import androidappinstaller.composeapp.generated.resources.setup_app_packages
+import androidappinstaller.composeapp.generated.resources.setup_config_required
+import androidappinstaller.composeapp.generated.resources.setup_device
+import androidappinstaller.composeapp.generated.resources.setup_download_button
+import androidappinstaller.composeapp.generated.resources.setup_error_dialog_title
+import androidappinstaller.composeapp.generated.resources.setup_install_button
+import androidappinstaller.composeapp.generated.resources.setup_install_message1
+import androidappinstaller.composeapp.generated.resources.setup_install_message2
+import androidappinstaller.composeapp.generated.resources.setup_install_message3
+import androidappinstaller.composeapp.generated.resources.setup_no_adb_message
+import androidappinstaller.composeapp.generated.resources.setup_no_packages_warning
+import androidappinstaller.composeapp.generated.resources.setup_not_set
+import androidappinstaller.composeapp.generated.resources.setup_package_downloaded
+import androidappinstaller.composeapp.generated.resources.setup_package_downloading
+import androidappinstaller.composeapp.generated.resources.setup_package_error
+import androidappinstaller.composeapp.generated.resources.setup_package_idle
+import androidappinstaller.composeapp.generated.resources.setup_package_installed
+import androidappinstaller.composeapp.generated.resources.setup_package_installing
+import androidappinstaller.composeapp.generated.resources.setup_project
+import androidappinstaller.composeapp.generated.resources.setup_settings_button
+import androidappinstaller.composeapp.generated.resources.setup_target
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -49,6 +71,7 @@ import org.example.project.appinstaller.ui.screen.setup.model.SetupPackage
 import org.example.project.appinstaller.ui.screen.setup.model.SetupState
 import org.example.project.appinstaller.model.AppVersion
 import org.example.project.appinstaller.ui.theme.CustomTheme
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 class SetupScreen: Screen {
@@ -78,7 +101,7 @@ class SetupScreen: Screen {
 
                 ) {
                     Text(
-                        text = "Application configuration required. Please load a configuration file: File > load configuration...",
+                        text = stringResource(Res.string.setup_config_required),
                         textAlign = TextAlign.Center,
                         fontSize = 24.sp
                     )
@@ -91,14 +114,14 @@ class SetupScreen: Screen {
                     Row {
                         DropDownRow(
                             modifier = Modifier.padding(end = 10.dp),
-                            label = "Project",
+                            label = stringResource(Res.string.setup_project),
                             options = uiState.projects,
-                            default = uiState.selectedProject ?: "Not set"
+                            default = uiState.selectedProject ?: stringResource(Res.string.setup_not_set)
                         ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
                         DropDownRow(
-                            label = "Target",
+                            label = stringResource(Res.string.setup_target),
                             options = uiState.targets,
-                            default = uiState.selectedTarget ?: "Not set"
+                            default = uiState.selectedTarget ?: stringResource(Res.string.setup_not_set)
                         ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
                     }
 
@@ -121,9 +144,9 @@ class SetupScreen: Screen {
 
                     DropDownRow(
                         modifier = Modifier.padding(top = 20.dp),
-                        label = "Device",
+                        label = stringResource(Res.string.setup_device),
                         options = uiState.devices.map { it.label },
-                        default = uiState.selectedDevice?.label ?: "Not set"
+                        default = uiState.selectedDevice?.label ?: stringResource(Res.string.setup_not_set)
                     ) { labelSelected ->
                         uiState.devices.firstOrNull { it.label == labelSelected }?.let {
                             viewModel.onEvent(SetupEvent.OnDeviceSelected(it))
@@ -139,7 +162,7 @@ class SetupScreen: Screen {
                                     && versionState.versionValid
                                     && uiState.selectedDevice != null
                         ) {
-                            Text("Download")
+                            Text(stringResource(Res.string.setup_download_button))
                         }
                         Button(
                             modifier = Modifier.padding(start = 10.dp),
@@ -148,7 +171,7 @@ class SetupScreen: Screen {
                             enabled = uiState.selectedDevice != null && uiState.packages.filter { it.selected }
                                 .all { it.state == SetupPackage.State.Downloaded }
                         ) {
-                            Text("Install")
+                            Text(stringResource(Res.string.setup_install_button))
                         }
                     }
                     Row(
@@ -160,7 +183,7 @@ class SetupScreen: Screen {
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "Application packages",
+                            text = stringResource(Res.string.setup_app_packages),
                             style = MaterialTheme.typography.titleMedium,
                         )
                     }
@@ -191,7 +214,7 @@ class SetupScreen: Screen {
                     } else {
                         Text(
                             modifier = Modifier.padding(top = 20.dp),
-                            text = "You must select at least a project and a target in order to configure the application packages"
+                            text = stringResource(Res.string.setup_no_packages_warning)
                         )
                     }
                 }
@@ -215,25 +238,25 @@ class SetupScreen: Screen {
                 }
 
                 is SetupState.Error.GenericError -> {
-                    CustomAlertDialog("An error has occurred", it.description, "Ok", {}) {
+                    CustomAlertDialog(stringResource(Res.string.setup_error_dialog_title), it.description, "Ok", {}) {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
                     }
                 }
 
                 SetupState.Error.AdbBinaryNotFound -> {
                     val annotatedString = buildAnnotatedString {
-                        append("Please install the ")
+                        append(stringResource(Res.string.setup_install_message1))
                         withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
                             pushStringAnnotation(tag = "URL", annotation = "https://developer.android.com/studio/releases/platform-tools")
-                            append("ADB tool")
+                            append(stringResource(Res.string.setup_install_message2))
                             pop()
                         }
-                        append(" or configure the correct ADB path in the settings")
+                        append(stringResource(Res.string.setup_install_message3))
                     }
 
 
                     CustomAlertDialog(
-                        "Android Debug Bridge (adb) executable not found",
+                        title = stringResource(Res.string.setup_no_adb_message),
                         text = {
                             ClickableText(
                                 text = annotatedString,
@@ -245,7 +268,7 @@ class SetupScreen: Screen {
                                 }
                             )
                         },
-                        "Go to settings", {}) {
+                        buttonText = stringResource(Res.string.setup_settings_button), {}) {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
                         navigator.push(SettingsScreen())
                     }
@@ -265,13 +288,14 @@ class SetupScreen: Screen {
         SetupPackage.State.Error -> CustomTheme.colors.error
     }
 
+    @Composable
     private fun getAppState(state: SetupPackage.State) = when (state) {
-        SetupPackage.State.Idle -> "Idle"
-        SetupPackage.State.Downloading -> "Downloading..."
-        SetupPackage.State.Downloaded -> "Downloaded"
-        SetupPackage.State.Installing -> "Installing..."
-        SetupPackage.State.Installed -> "Installed"
-        SetupPackage.State.Error -> "Error"
+        SetupPackage.State.Idle -> stringResource(Res.string.setup_package_idle)
+        SetupPackage.State.Downloading -> stringResource(Res.string.setup_package_downloading)
+        SetupPackage.State.Downloaded -> stringResource(Res.string.setup_package_downloaded)
+        SetupPackage.State.Installing -> stringResource(Res.string.setup_package_installing)
+        SetupPackage.State.Installed -> stringResource(Res.string.setup_package_installed)
+        SetupPackage.State.Error -> stringResource(Res.string.setup_package_error)
     }
 
     private fun isTransientState(state: SetupPackage.State) = when (state) {

@@ -12,6 +12,8 @@ import org.example.project.appinstaller.platform.filesystem.PlatformFileSystem
 import org.example.project.appinstaller.platform.filesystem.PlatformFileSystemImpl
 import org.example.project.appinstaller.platform.intent.BrowserLauncher
 import org.example.project.appinstaller.platform.intent.BrowserLauncherImpl
+import org.example.project.appinstaller.platform.localization.LocaleManager
+import org.example.project.appinstaller.platform.localization.LocaleManagerImpl
 import org.example.project.appinstaller.platform.uri.UriParser
 import org.example.project.appinstaller.platform.uri.UriParserImpl
 import org.koin.dsl.module
@@ -22,4 +24,5 @@ actual val platformSystemModule = module{
     single<DeviceManager> { JadbDeviceManager(Dispatchers.IO) }
     factory<AdbBinary> { AdbBinaryImpl(Dispatchers.IO) }
     factoryOf(::BrowserLauncherImpl){ bind<BrowserLauncher>() }
+    single<LocaleManager> { LocaleManagerImpl() }
 }

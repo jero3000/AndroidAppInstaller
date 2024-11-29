@@ -1,5 +1,23 @@
 package org.example.project.appinstaller.ui.screen.settings
 
+import androidappinstaller.composeapp.generated.resources.Res
+import androidappinstaller.composeapp.generated.resources.settings_adb_binary
+import androidappinstaller.composeapp.generated.resources.settings_adb_binary_picker_button_title
+import androidappinstaller.composeapp.generated.resources.settings_adb_binary_picker_title
+import androidappinstaller.composeapp.generated.resources.settings_adb_host
+import androidappinstaller.composeapp.generated.resources.settings_adb_port
+import androidappinstaller.composeapp.generated.resources.settings_adb_sticker_fail
+import androidappinstaller.composeapp.generated.resources.settings_adb_sticker_ok
+import androidappinstaller.composeapp.generated.resources.settings_back_button
+import androidappinstaller.composeapp.generated.resources.settings_clear_cache_button
+import androidappinstaller.composeapp.generated.resources.settings_clear_credentials_button
+import androidappinstaller.composeapp.generated.resources.settings_install_mode
+import androidappinstaller.composeapp.generated.resources.settings_install_mode_clean
+import androidappinstaller.composeapp.generated.resources.settings_install_mode_clean_tooltip
+import androidappinstaller.composeapp.generated.resources.settings_install_mode_downgrade
+import androidappinstaller.composeapp.generated.resources.settings_install_mode_downgrade_tooltip
+import androidappinstaller.composeapp.generated.resources.settings_install_mode_normal
+import androidappinstaller.composeapp.generated.resources.settings_install_mode_normal_tooltip
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +57,7 @@ import org.example.project.appinstaller.ui.component.RadioEntry
 import org.example.project.appinstaller.ui.component.RadioGroup
 import org.example.project.appinstaller.ui.component.StatusSticker
 import org.example.project.appinstaller.ui.screen.settings.model.SettingsEvent
+import org.jetbrains.compose.resources.stringResource
 
 class SettingsScreen : Screen{
 
@@ -53,7 +72,7 @@ class SettingsScreen : Screen{
                 TextButton(modifier = Modifier.padding(start = 5.dp), onClick = {
                     navigator.popUntilRoot()
                 }) {
-                    Text("< back")
+                    Text("< " + stringResource(Res.string.settings_back_button))
                 }
 
                 Column(
@@ -61,15 +80,17 @@ class SettingsScreen : Screen{
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     val coroutineScope = rememberCoroutineScope()
+                    val title = stringResource(Res.string.settings_adb_binary_picker_title)
                     FilePicker(
                         modifier = Modifier.padding(top = 10.dp, bottom = 20.dp),
-                        "Adb binary",
-                        state.adbBinaryPath
+                        stringResource(Res.string.settings_adb_binary),
+                        state.adbBinaryPath,
+                        stringResource(Res.string.settings_adb_binary_picker_button_title)
                     ) {
                         coroutineScope.launch {
                             FileKit.pickFile(
                                 mode = PickerMode.Single,
-                                title = "Select the Adb binary executable",
+                                title = title,
                             )?.toKmpFile()?.let {
                                 screenModel.onEvent(SettingsEvent.OnAdbBinaryConfigured(it))
                             }
@@ -86,7 +107,7 @@ class SettingsScreen : Screen{
                             },
                             value = host,
                             onValueChange = { onHostChanged(it) },
-                            label = { Text("Adb server host", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(Res.string.settings_adb_host), style = MaterialTheme.typography.labelSmall) },
                             isError = host.isBlank(),
                             singleLine = true
                         )
@@ -101,13 +122,13 @@ class SettingsScreen : Screen{
                                 },
                             value = port,
                             onValueChange = { onPortChanged(it) },
-                            label = { Text("Adb server port", style = MaterialTheme.typography.labelSmall) },
+                            label = { Text(stringResource(Res.string.settings_adb_port), style = MaterialTheme.typography.labelSmall) },
                             isError = port.toIntOrNull()?.let { it <= 0 } ?: true,
                             singleLine = true
                         )
-                        StatusSticker(modifier = Modifier.size(width = 150.dp, height = 57.dp).padding(start = 10.dp),
-                            okStatusText = "ADB server running",
-                            failStatusText = "ADB server not running",
+                        StatusSticker(modifier = Modifier.size(width = 155.dp, height = 57.dp).padding(start = 10.dp),
+                            okStatusText = stringResource(Res.string.settings_adb_sticker_ok),
+                            failStatusText = stringResource(Res.string.settings_adb_sticker_fail),
                             okStatus = state.adbServerRunning)
                     }
                     val options = provideInstallationModes()
@@ -115,7 +136,7 @@ class SettingsScreen : Screen{
                         modifier = Modifier.width(250.dp)
                             .clip(RoundedCornerShape(5.dp))
                             .background(Color.LightGray),
-                        title = "Install mode",
+                        title = stringResource(Res.string.settings_install_mode),
                         selectedOption = options.first { it.key == state.installMode.key },
                         radioOptions = options
                     ) { mode ->
@@ -123,12 +144,12 @@ class SettingsScreen : Screen{
                         screenModel.onEvent(SettingsEvent.OnInstallModeChanged(installMode))
                     }
                     Row(modifier = Modifier.padding(top = 20.dp)) {
-                        AnimatedButton(text = "Clear credentials") {
+                        AnimatedButton(text = stringResource(Res.string.settings_clear_credentials_button)) {
                             screenModel.onEvent(SettingsEvent.OnClearCredentials)
                         }
                         AnimatedButton(
                             modifier = Modifier.padding(start = 10.dp),
-                            text = "Clear cache"
+                            text = stringResource(Res.string.settings_clear_cache_button)
                         ) {
                             screenModel.onEvent(SettingsEvent.OnClearCache)
                         }
@@ -139,22 +160,23 @@ class SettingsScreen : Screen{
     }
 }
 
+@Composable
 fun provideInstallationModes() =
     Device.InstallMode.entries.map {
         when (it) {
             Device.InstallMode.NORMAL -> RadioEntry(
-                "Normal",
-                "Normal installation mode",
+                stringResource(Res.string.settings_install_mode_normal),
+                stringResource(Res.string.settings_install_mode_normal_tooltip),
                 Device.InstallMode.NORMAL.key
             )
             Device.InstallMode.DOWNGRADE -> RadioEntry(
-                "Downgrade",
-                "Allows version downgrade keeping the application data",
+                stringResource(Res.string.settings_install_mode_downgrade),
+                stringResource(Res.string.settings_install_mode_downgrade_tooltip),
                 Device.InstallMode.DOWNGRADE.key
             )
             Device.InstallMode.CLEAN -> RadioEntry(
-                "Clean",
-                "Uninstall the app and data if present, then performs a clean install",
+                stringResource(Res.string.settings_install_mode_clean),
+                stringResource(Res.string.settings_install_mode_clean_tooltip),
                 Device.InstallMode.CLEAN.key
             )
         }
