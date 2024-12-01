@@ -16,7 +16,7 @@ import kotlin.coroutines.CoroutineContext
 
 class CredentialPreferencesDataSource(settingsFactory: Settings.Factory, private val ioContext: CoroutineContext): CredentialDataSource {
 
-    private val settings =  settingsFactory.create("org.example.project.appinstaller")
+    private val settings =  settingsFactory.create("com.jero3000.appinstaller.credentials")
 
     override suspend fun getCredential(host: String) = withContext(ioContext){
             settings.getStringOrNull(host)?.let { decrypt(it) }
