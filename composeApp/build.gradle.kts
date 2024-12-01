@@ -68,7 +68,7 @@ kotlin {
 
 compose.desktop {
     application {
-        mainClass = "org.example.project.appinstaller.MainKt"
+        mainClass = "com.jero3000.appinstaller.MainKt"
         val appVersion = "1.0.0"
         jvmArgs += listOf("-DversionName=$appVersion")
         nativeDistributions {
@@ -83,7 +83,7 @@ compose.desktop {
                 iconFile.set(project.file("src/desktopMain/resources/installer_icon.ico"))
             }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "org.example.project.appinstaller"
+            packageName = "com.jero3000.appinstaller"
             packageVersion = appVersion
             description = "Android application installer"
             copyright = "© 2024 Jerónimo Muñoz. MIT license"
