@@ -9,6 +9,7 @@ import org.example.project.appinstaller.repository.file.datasource.FileDataSourc
 import org.junit.Test
 import dev.mokkery.MockMode.autofill
 import dev.mokkery.MockMode.autoUnit
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.returnsArgAt
 import dev.mokkery.every
@@ -34,7 +35,9 @@ class FileRepositoryImplTest {
         val fileDataSource = mock<FileDataSource>()
         val fileSystem = mock<PlatformFileSystem>(autofill){
             every { getTempDirectory() } returns "/tmp"
-            every { getFileSeparator() } returns "/"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
             every { getUri(any()) } returnsArgAt 0
         }
         val uriParser = mock<UriParser>(autofill){
@@ -59,7 +62,9 @@ class FileRepositoryImplTest {
         val fileDataSource = mock<FileDataSource>()
         val fileSystem = mock<PlatformFileSystem>(autofill){
             every { getTempDirectory() } returns "/tmp"
-            every { getFileSeparator() } returns "/"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
             every { getUri(any()) } returnsArgAt 0
         }
         val uriParser = mock<UriParser>(autofill){
@@ -86,7 +91,9 @@ class FileRepositoryImplTest {
         }
         val fileSystem = mock<PlatformFileSystem>(autofill){
             every { getTempDirectory() } returns "/tmp"
-            every { getFileSeparator() } returns "/"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
             every { getUri(any()) } returnsArgAt 0
         }
         val uriParser = mock<UriParser>(autofill){
@@ -117,14 +124,16 @@ class FileRepositoryImplTest {
         }
         val fileSystem = mock<PlatformFileSystem>(autofill){
             every { getTempDirectory() } returns "/tmp"
-            every { getFileSeparator() } returns "/"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
             every { getUri(any()) } returnsArgAt 0
         }
         val uriParser = mock<UriParser>(autofill){
             every { getFilename(any()) } returns "file.apk"
         }
         val credential = Credential("user", "pass")
-        val credentialsRepo = mock<CredentialRepository>() {
+        val credentialsRepo = mock<CredentialRepository> {
             everySuspend { getCredential(any()) } returns credential
         }
         val dirMock = mock<IPlatformFile>(autoUnit){
@@ -148,7 +157,9 @@ class FileRepositoryImplTest {
         }
         val fileSystem = mock<PlatformFileSystem>(autofill){
             every { getTempDirectory() } returns "/tmp"
-            every { getFileSeparator() } returns "/"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
             every { getUri(any()) } returnsArgAt 0
         }
         val uriParser = mock<UriParser>(autofill){

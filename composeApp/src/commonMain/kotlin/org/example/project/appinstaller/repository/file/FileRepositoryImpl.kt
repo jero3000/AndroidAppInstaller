@@ -18,27 +18,22 @@ class FileRepositoryImpl(private val dataSource: FileDataSource,
 
     override fun getFile(url: String): IPlatformFile? {
         return kotlin.runCatching { uriParser.getFilename(url) }.getOrNull()?.let { fileName ->
-            val tmpDir = platformFileSystem.getTempDirectory()
-            val fileSeparator = platformFileSystem.getFileSeparator()
-            val filePath = tmpDir.takeIf { it.endsWith(fileSeparator) }
-                ?.let { it + TEMP_DIR_NAME + fileSeparator + fileName }
-                ?: (tmpDir + fileSeparator + TEMP_DIR_NAME + fileSeparator + fileName)
+            val tmpDir = platformFileSystem.combine(platformFileSystem.getTempDirectory(), TEMP_DIR_NAME)
+            val filePath = platformFileSystem.combine(tmpDir, fileName)
             fileUtils.getFileFromPath(filePath, false)?.takeIf { it.getExists() }
         }
     }
 
     override suspend fun fetchFile(url: String): Result<IPlatformFile> {
-        val tmpDir = platformFileSystem.getTempDirectory()
-        val dirPath = tmpDir.takeIf { it.endsWith(platformFileSystem.getFileSeparator()) }
-            ?.let { it + TEMP_DIR_NAME } ?: (tmpDir + platformFileSystem.getFileSeparator() + TEMP_DIR_NAME)
-        return fileUtils.getFileFromPath(dirPath, true)?.let { dir ->
+        val tmpDir = platformFileSystem.combine(platformFileSystem.getTempDirectory(), TEMP_DIR_NAME)
+        return fileUtils.getFileFromPath(tmpDir, true)?.let { dir ->
             val exists = if(!dir.getExists()){
                 dir.mkdir()
             } else true
 
             if(exists){
                 val credential = credentialRepository.getCredential(Url(url).host)
-                dataSource.getFile(url, dirPath, credential).also {
+                dataSource.getFile(url, tmpDir, credential).also {
                     if(it.exceptionOrNull() is CredentialsRequiredException){
                         credentialRepository.deleteCredential(Url(url).host)
                     }
@@ -50,10 +45,8 @@ class FileRepositoryImpl(private val dataSource: FileDataSource,
     }
 
     override suspend fun clear() {
-        val tmpDir = platformFileSystem.getTempDirectory()
-        val dirPath = tmpDir.takeIf { it.endsWith(platformFileSystem.getFileSeparator()) }
-            ?.let { it + TEMP_DIR_NAME } ?: (tmpDir + platformFileSystem.getFileSeparator() + TEMP_DIR_NAME)
-        fileUtils.getFileFromPath(dirPath, true)?.let { dir ->
+        val tmpDir = platformFileSystem.combine(platformFileSystem.getTempDirectory(), TEMP_DIR_NAME)
+        fileUtils.getFileFromPath(tmpDir, true)?.let { dir ->
             dir.listFiles()?.forEach {
                 it.delete()
             }

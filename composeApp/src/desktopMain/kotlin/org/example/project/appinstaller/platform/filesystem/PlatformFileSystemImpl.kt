@@ -6,8 +6,9 @@ import java.nio.file.Paths
 
 
 class PlatformFileSystemImpl : PlatformFileSystem {
-    override fun getAppDataDirectory(): String {
-        return AppDirsFactory.getInstance().getUserDataDir("AndroidAppInstaller", null, "jero3000")
+
+    override fun getAppDataDirectory(appName: String, author: String): String {
+        return AppDirsFactory.getInstance().getUserDataDir(appName, null, author)
     }
 
     override fun getUserDirectory(): String {
@@ -18,8 +19,8 @@ class PlatformFileSystemImpl : PlatformFileSystem {
         return System.getProperty("java.io.tmpdir")
     }
 
-    override fun getFileSeparator(): String {
-        return File.separator
+    override fun combine(path1: String, path2: String): String {
+        return File(path1).resolve(path2).absolutePath
     }
 
     override fun getUri(path: String): String {

@@ -19,7 +19,8 @@ class ConfigurationLocalDataSource(private val ioContext: CoroutineContext,
 ) :
     ConfigurationDataSource {
     override suspend fun getConfiguration(): Result<AppConfig> {
-        val filePath = "${platformFileSystem.getAppDataDirectory()}${platformFileSystem.getFileSeparator()}$CONFIG_FILE_NAME"
+        val appDataDirectory = platformFileSystem.getAppDataDirectory("AndroidAppInstaller", "jero3000")
+        val filePath = platformFileSystem.combine(appDataDirectory, CONFIG_FILE_NAME)
         val file = fileUtils.getFileFromPath(filePath, false) ?: throw IOException("File $filePath not found!")
         return loadConfiguration(file, false)
     }
@@ -36,13 +37,14 @@ class ConfigurationLocalDataSource(private val ioContext: CoroutineContext,
             }
         } ?: Result.failure(jsonResult.exceptionOrNull() ?: Exception("Unknown error parsing the JSON file"))
         if(result.isSuccess && copyToAppData){
-            val appDataDirectory = fileUtils.getFileFromPath(platformFileSystem.getAppDataDirectory(), true)
+            val appDataPath = platformFileSystem.getAppDataDirectory("AndroidAppInstaller", "jero3000")
+            val appDataDirectory = fileUtils.getFileFromPath(appDataPath, true)
             val directoryOk = if(appDataDirectory?.getExists() == false) {
                 appDataDirectory.mkdirs()
             } else appDataDirectory != null
 
             if(directoryOk){
-                val targetPath = "${platformFileSystem.getAppDataDirectory()}${platformFileSystem.getFileSeparator()}$CONFIG_FILE_NAME"
+                val targetPath = platformFileSystem.combine(appDataPath, CONFIG_FILE_NAME)
                 fileUtils.getFileFromPath(targetPath, false)?.let { targetFile ->
                     withContext(ioContext) {
                         fileSystem.writeTextFile(jsonResult.getOrNull()!!, targetFile)

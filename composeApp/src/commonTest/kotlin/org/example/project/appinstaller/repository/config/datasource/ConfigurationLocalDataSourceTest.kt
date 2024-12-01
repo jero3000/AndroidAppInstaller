@@ -1,5 +1,6 @@
 package org.example.project.appinstaller.repository.config.datasource
 
+import dev.mokkery.answering.calls
 import dev.mokkery.answering.returns
 import dev.mokkery.answering.returnsSuccess
 import dev.mokkery.every
@@ -29,8 +30,10 @@ class ConfigurationLocalDataSourceTest{
             everySuspend { readTextFile(any()) } returns jsonResult
         }
         val platformFileSystem : PlatformFileSystem = mock{
-            every { getAppDataDirectory() } returns "/userDir"
-            every { getFileSeparator() } returns "/"
+            every { getAppDataDirectory(any(), any()) } returns "/userDir"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
         }
         val fileUtils : FileUtils = mock{
             every{ getFileFromPath(any(), any()) } returns mock()
@@ -38,7 +41,7 @@ class ConfigurationLocalDataSourceTest{
         val dataSource = ConfigurationLocalDataSource(backgroundScope.coroutineContext, fileSystem, platformFileSystem, fileUtils)
 
         val result = dataSource.getConfiguration()
-        verify { platformFileSystem.getAppDataDirectory() }
+        verify { platformFileSystem.getAppDataDirectory(any(), any()) }
         assertTrue(result.isSuccess)
         val appConfig = result.getOrNull()
         assertNotNull(appConfig)
@@ -57,11 +60,13 @@ class ConfigurationLocalDataSourceTest{
             everySuspend { writeTextFile(any(), any()) } returnsSuccess Unit
         }
         val platformFileSystem : PlatformFileSystem = mock{
-            every { getAppDataDirectory() } returns "/userDir"
-            every { getFileSeparator() } returns "/"
+            every { getAppDataDirectory(any(), any()) } returns "/userDir"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
         }
         val fileUtils : FileUtils = mock{
-            every{ getFileFromPath(any(), any()) } returns mock(){
+            every{ getFileFromPath(any(), any()) } returns mock{
                 every { getExists() } returns true
             }
         }
@@ -70,7 +75,7 @@ class ConfigurationLocalDataSourceTest{
         val configFile = mock<IPlatformFile>()
         val result = dataSource.loadConfiguration(configFile)
         verifySuspend { fileSystem.readTextFile(eqRef(configFile)) }
-        verify { platformFileSystem.getAppDataDirectory() }
+        verify { platformFileSystem.getAppDataDirectory(any(), any()) }
         verifySuspend { fileSystem.writeTextFile(any(), any()) }
         assertTrue (result.isSuccess)
     }
@@ -83,11 +88,13 @@ class ConfigurationLocalDataSourceTest{
             everySuspend { writeTextFile(any(), any()) } returnsSuccess Unit
         }
         val platformFileSystem : PlatformFileSystem = mock{
-            every { getAppDataDirectory() } returns "/userDir"
-            every { getFileSeparator() } returns "/"
+            every { getAppDataDirectory(any(), any()) } returns "/userDir"
+            every { combine(any(), any()) } calls { (path1: String, path2: String) ->
+                "$path1/$path2"
+            }
         }
         val fileUtils : FileUtils = mock{
-            every{ getFileFromPath(any(), any()) } returns mock(){
+            every{ getFileFromPath(any(), any()) } returns mock{
                 every { getExists() } returns true
             }
         }
@@ -96,7 +103,7 @@ class ConfigurationLocalDataSourceTest{
         val configFile = mock<IPlatformFile>()
         val result = dataSource.loadConfiguration(configFile)
         verifySuspend { fileSystem.readTextFile(eqRef(configFile)) }
-        verifySuspend(VerifyMode.not) { platformFileSystem.getAppDataDirectory() }
+        verifySuspend(VerifyMode.not) { platformFileSystem.getAppDataDirectory(any(), any()) }
         verifySuspend(VerifyMode.not) { fileSystem.writeTextFile(any(), any()) }
         assertTrue (result.isFailure)
     }
