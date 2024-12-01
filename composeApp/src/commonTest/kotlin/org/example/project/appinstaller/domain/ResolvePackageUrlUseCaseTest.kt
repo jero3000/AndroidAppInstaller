@@ -1,6 +1,7 @@
 package org.example.project.appinstaller.domain
 
 import org.example.project.appinstaller.model.AppPackage
+import org.example.project.appinstaller.model.AppVersion
 import org.example.project.appinstaller.model.BuildVariant
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -12,13 +13,13 @@ class ResolvePackageUrlUseCaseTest{
         val resolver = ResolvePackageUrlUseCase()
         val buildVariant = BuildVariant("name", "https://www.example.com/", emptyMap(), emptyList())
         val appPackage = AppPackage("name", "packageName", "releaseR{major}.{minor}.{micro}_{build}.apk")
-        val placeholders = mapOf(
-            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to "1",
-            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to "2",
-            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to "3",
-            ResolvePackageUrlUseCase.BUILD_PLACEHOLDER to "4",
+        val appVersion = AppVersion(
+            "1",
+            "2",
+            "3",
+            "4",
         )
-        val url = resolver(buildVariant, appPackage, placeholders)
+        val url = resolver(buildVariant, appPackage, appVersion, "manufacturer")
         assertEquals("https://www.example.com/releaseR1.2.3_4.apk", url)
     }
 
@@ -27,13 +28,31 @@ class ResolvePackageUrlUseCaseTest{
         val resolver = ResolvePackageUrlUseCase()
         val buildVariant = BuildVariant("name", "https://www.example.com", emptyMap(), emptyList())
         val appPackage = AppPackage("name", "packageName", "releaseR{major}.{minor}.{micro}_{build}.apk")
-        val placeholders = mapOf(
-            ResolvePackageUrlUseCase.MAJOR_PLACEHOLDER to "1",
-            ResolvePackageUrlUseCase.MINOR_PLACEHOLDER to "2",
-            ResolvePackageUrlUseCase.MICRO_PLACEHOLDER to "3",
-            ResolvePackageUrlUseCase.BUILD_PLACEHOLDER to "4",
+        val appVersion = AppVersion(
+            "1",
+            "2",
+            "3",
+            "4",
         )
-        val url = resolver(buildVariant, appPackage, placeholders)
+        val url = resolver(buildVariant, appPackage, appVersion, "manufacturer")
         assertEquals("https://www.example.com/releaseR1.2.3_4.apk", url)
     }
+
+    @Test
+    fun `resolve url where the location includes manufacturer with mapping available`(){
+        val resolver = ResolvePackageUrlUseCase()
+        val buildVariant = BuildVariant("name", "https://www.example.com", mapOf(
+            "manufacturer" to "man"
+        ), emptyList())
+        val appPackage = AppPackage("name", "packageName", "releaseR{major}.{minor}.{micro}_{build}_{device}.apk")
+        val appVersion = AppVersion(
+            "1",
+            "2",
+            "3",
+            "4",
+        )
+        val url = resolver(buildVariant, appPackage, appVersion, "manufacturer")
+        assertEquals("https://www.example.com/releaseR1.2.3_4_man.apk", url)
+    }
+
 }
