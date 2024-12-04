@@ -32,3 +32,5 @@ dependencyResolutionManagement {
 }
 
 include(":composeApp")
+include(":jadb:lib")
+include(":dadb:lib")

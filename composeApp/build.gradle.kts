@@ -3,22 +3,21 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.jetbrainsCompose)
-    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.composeMultiplatform)
+    alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlinSerialization)
     alias(libs.plugins.mokkery)
 }
 
 kotlin {
     jvm("desktop")
-    
+
     sourceSets {
         val desktopMain by getting
 
         commonMain.dependencies {
             implementation(compose.runtime)
             implementation(compose.foundation)
-            implementation(compose.material)
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
@@ -46,14 +45,16 @@ kotlin {
             implementation(libs.kmpFile.filekit)
         }
         desktopMain.dependencies {
-            implementation(compose.desktop.currentOs)
+            implementation(compose.desktop.currentOs){
+                exclude("org.jetbrains.compose.material")
+            }
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.commons.net)
             implementation(libs.multiplatform.settings)
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.appdirs)
-            implementation(libs.dadb)
-            implementation(libs.jadb)
+            implementation(project(":jadb:lib"))
+            implementation(project(":dadb:lib"))
         }
 
         commonTest.dependencies {
@@ -67,12 +68,20 @@ kotlin {
 
 
 compose.desktop {
+
     application {
+        buildTypes.release.proguard {
+            configurationFiles.from("proguard-rules.pro")
+            obfuscate.set(true)
+            isEnabled.set(true)
+            optimize.set(false)
+            version.set("7.6.0")
+        }
+
         mainClass = "com.jero3000.appinstaller.MainKt"
         val appVersion = "1.0.0"
         jvmArgs += listOf("-DversionName=$appVersion")
         nativeDistributions {
-            modules("java.instrument", "java.management", "java.prefs", "jdk.security.auth", "jdk.unsupported")
             linux {
                 iconFile.set(project.file("src/desktopMain/resources/installer_icon.png"))
             }
@@ -83,9 +92,9 @@ compose.desktop {
                 iconFile.set(project.file("src/desktopMain/resources/installer_icon.ico"))
             }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "com.jero3000.appinstaller"
+            packageName = "Android App Installer"
             packageVersion = appVersion
-            description = "Android application installer"
+            description = "Android Application Installer"
             copyright = "© 2024 Jerónimo Muñoz. MIT license"
             licenseFile.set(project.file("../LICENSE"))
         }

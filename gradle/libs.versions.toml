@@ -1,6 +1,6 @@
 [versions]
 androidx-lifecycle = "2.8.0"
-compose-plugin = "1.6.11"
+compose-multiplatform = "1.7.0"
 junit = "4.13.2"
 kotlin = "2.0.20"
 kotlinx-coroutines = "1.8.1"
@@ -14,7 +14,7 @@ commons-net = "3.11.1"
 multiplatformSettings = "1.2.0"
 ktor = "3.0.0"
 cryptography = "0.4.0"
-voyager = "1.1.0-beta02"
+voyager = "1.1.0-beta03"
 filekit = "0.8.7"
 
 [libraries]
@@ -49,8 +49,8 @@ dadb = { module = "dev.mobile:dadb", version = "1.2.8" }
 jadb = { module = "com.github.vidstige:jadb", version = "1.2.1"}
 
 [plugins]
-jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
+composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 mokkery = {id = "dev.mokkery", version.ref = "mokkeryVersion"}

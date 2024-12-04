@@ -1,0 +1,6 @@
+[submodule "dadb/lib/dadb"]
+	path = dadb/lib/dadb
+	url = https://github.com/mobile-dev-inc/dadb.git
+[submodule "jadb/lib/jadb"]
+	path = jadb/lib/jadb
+	url = https://github.com/vidstige/jadb.git
