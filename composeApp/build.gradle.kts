@@ -72,7 +72,7 @@ compose.desktop {
     application {
         buildTypes.release.proguard {
             configurationFiles.from("proguard-rules.pro")
-            obfuscate.set(true)
+            obfuscate.set(false)
             isEnabled.set(true)
             optimize.set(false)
             version.set("7.6.0")
@@ -90,6 +90,8 @@ compose.desktop {
             }
             windows{
                 iconFile.set(project.file("src/desktopMain/resources/installer_icon.ico"))
+                dirChooser = true
+                menuGroup = "Android utils"
             }
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Android App Installer"
