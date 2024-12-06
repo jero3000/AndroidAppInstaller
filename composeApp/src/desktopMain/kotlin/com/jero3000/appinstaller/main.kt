@@ -61,6 +61,7 @@ import com.jero3000.appinstaller.platform.localization.LocaleManager
 import com.jero3000.appinstaller.platform.localization.LocalizedApp
 import com.jero3000.appinstaller.repository.preferences.ApplicationPreferences
 import com.jero3000.appinstaller.ui.component.CustomAlertDialog
+import com.jero3000.appinstaller.ui.screen.Application
 import com.jero3000.appinstaller.ui.screen.MenuActions
 import com.jero3000.appinstaller.ui.screen.settings.SettingsScreen
 import com.jero3000.appinstaller.ui.screen.setup.SetupScreen
@@ -85,6 +86,9 @@ fun main() {
         var exitPopup by remember { mutableStateOf(false) }
         var isAboutOpen by remember { mutableStateOf(false) }
         var currentLocale by remember { mutableStateOf(defaultLocale) }
+        Application.onExit = {
+            isOpen = false
+        }
 
         if (isOpen) {
             LocalizedApp(locale = currentLocale) {

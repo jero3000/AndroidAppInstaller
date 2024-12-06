@@ -1,11 +1,10 @@
 package com.jero3000.appinstaller.repository.config
 
-import dev.zwander.kotlin.file.IPlatformFile
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import com.jero3000.appinstaller.model.AppConfig
 import com.jero3000.appinstaller.repository.config.datasource.ConfigurationDataSource
+import dev.zwander.kotlin.file.IPlatformFile
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.flow
 
 class ConfigurationRepositoryImpl(private val dataSource: ConfigurationDataSource) :
     ConfigurationRepository {
@@ -32,5 +31,9 @@ class ConfigurationRepositoryImpl(private val dataSource: ConfigurationDataSourc
 
     override fun loadConfiguration(file: IPlatformFile) {
         loadChannel.trySend(file)
+    }
+
+    override suspend fun clearConfiguration() {
+        dataSource.clearConfiguration()
     }
 }

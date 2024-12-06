@@ -27,6 +27,12 @@ class ConfigurationLocalDataSource(private val ioContext: CoroutineContext,
 
     override suspend fun loadConfiguration(file: IPlatformFile) = loadConfiguration(file, true)
 
+    override suspend fun clearConfiguration() {
+        val appDataDirectory = platformFileSystem.getAppDataDirectory("AndroidAppInstaller", "jero3000")
+        val filePath = platformFileSystem.combine(appDataDirectory, CONFIG_FILE_NAME)
+        fileUtils.getFileFromPath(filePath, false)?.delete()
+    }
+
     private suspend fun loadConfiguration(file: IPlatformFile, copyToAppData: Boolean): Result<AppConfig> {
         val jsonResult = withContext(ioContext){
             fileSystem.readTextFile(file)

@@ -57,5 +57,7 @@
     <string name="settings_install_mode_downgrade_tooltip">Allows version downgrade keeping the application data</string>
     <string name="settings_install_mode_clean">Clean</string>
     <string name="settings_install_mode_clean_tooltip">Uninstall the app and data if present, then performs a clean install</string>
-
+    <string name="settings_restore_settings_button">Restore settings</string>
+    <string name="settings_restore_settings_title_popup">Restore settings</string>
+    <string name="settings_restore_settings_confirmation_message">Application will be closed. Are you sure?</string>
 </resources>

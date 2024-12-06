@@ -18,6 +18,9 @@ import androidappinstaller.composeapp.generated.resources.settings_install_mode_
 import androidappinstaller.composeapp.generated.resources.settings_install_mode_downgrade_tooltip
 import androidappinstaller.composeapp.generated.resources.settings_install_mode_normal
 import androidappinstaller.composeapp.generated.resources.settings_install_mode_normal_tooltip
+import androidappinstaller.composeapp.generated.resources.settings_restore_settings_button
+import androidappinstaller.composeapp.generated.resources.settings_restore_settings_confirmation_message
+import androidappinstaller.composeapp.generated.resources.settings_restore_settings_title_popup
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -36,6 +39,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,17 +50,19 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import dev.zwander.kotlin.file.filekit.toKmpFile
-import io.github.vinceglb.filekit.core.FileKit
-import io.github.vinceglb.filekit.core.PickerMode
-import kotlinx.coroutines.launch
 import com.jero3000.appinstaller.platform.device.Device
 import com.jero3000.appinstaller.ui.component.AnimatedButton
+import com.jero3000.appinstaller.ui.component.CustomAlertDialog
 import com.jero3000.appinstaller.ui.component.FilePicker
 import com.jero3000.appinstaller.ui.component.RadioEntry
 import com.jero3000.appinstaller.ui.component.RadioGroup
 import com.jero3000.appinstaller.ui.component.StatusSticker
+import com.jero3000.appinstaller.ui.screen.Application
 import com.jero3000.appinstaller.ui.screen.settings.model.SettingsEvent
+import dev.zwander.kotlin.file.filekit.toKmpFile
+import io.github.vinceglb.filekit.core.FileKit
+import io.github.vinceglb.filekit.core.PickerMode
+import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.stringResource
 
 class SettingsScreen : Screen{
@@ -68,6 +74,7 @@ class SettingsScreen : Screen{
 
         val navigator = LocalNavigator.currentOrThrow
         if(!state.isLoading) {
+            var restoreSettingsConfirmation by remember { mutableStateOf(false) }
             Column {
                 TextButton(modifier = Modifier.padding(start = 5.dp), onClick = {
                     navigator.popUntilRoot()
@@ -153,10 +160,26 @@ class SettingsScreen : Screen{
                         ) {
                             screenModel.onEvent(SettingsEvent.OnClearCache)
                         }
+                        AnimatedButton(
+                            modifier = Modifier.padding(start = 10.dp),
+                            text = stringResource(Res.string.settings_restore_settings_button)
+                        ) {
+                            restoreSettingsConfirmation = true
+                        }
                     }
                 }
             }
+            if (restoreSettingsConfirmation) {
+                CustomAlertDialog(
+                    stringResource(Res.string.settings_restore_settings_title_popup),
+                    stringResource(Res.string.settings_restore_settings_confirmation_message), "Ok",
+                    { restoreSettingsConfirmation = false }
+                ) {
+                    screenModel.onEvent(SettingsEvent.OnRestoreSettings)
+                }
+            }
         }
+        if(state.onExit) Application.exit()
     }
 }
 

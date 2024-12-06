@@ -15,6 +15,7 @@ import com.jero3000.appinstaller.domain.GetPackageFileUseCase
 import com.jero3000.appinstaller.domain.InstallAppPackageUseCase
 import com.jero3000.appinstaller.domain.LoadAppConfigUseCase
 import com.jero3000.appinstaller.domain.ResolvePackageUrlUseCase
+import com.jero3000.appinstaller.domain.RestoreSettingsUseCase
 import com.jero3000.appinstaller.domain.StoreCredentialsUseCase
 
 val domainModule = module {
@@ -32,4 +33,5 @@ val domainModule = module {
     factoryOf(::PutAdbBinaryUseCase)
     factoryOf(::EnsureAdbServerRunningUseCase)
     factoryOf(::CheckAdbServerRunningUseCase)
+    factoryOf(::RestoreSettingsUseCase)
 }

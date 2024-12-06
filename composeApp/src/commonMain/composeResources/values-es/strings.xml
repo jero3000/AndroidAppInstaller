@@ -57,4 +57,7 @@
     <string name="settings_install_mode_downgrade_tooltip">Permite instalar una versión anterior manteniendo los datos de la aplicación</string>
     <string name="settings_install_mode_clean">Clean</string>
     <string name="settings_install_mode_clean_tooltip">Desinstala la aplicación y borra los datos. Después hace una instalación limpia</string>
+    <string name="settings_restore_settings_button">Restablecer ajustes</string>
+    <string name="settings_restore_settings_title_popup">Restablecer ajustes</string>
+    <string name="settings_restore_settings_confirmation_message">La aplicación se cerrará. ¿Estás seguro?</string>
 </resources>

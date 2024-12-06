@@ -10,6 +10,7 @@ import com.jero3000.appinstaller.domain.ClearCredentialsUseCase
 import com.jero3000.appinstaller.domain.EnsureAdbServerRunningUseCase
 import com.jero3000.appinstaller.domain.GetAdbBinaryUseCase
 import com.jero3000.appinstaller.domain.PutAdbBinaryUseCase
+import com.jero3000.appinstaller.domain.RestoreSettingsUseCase
 import com.jero3000.appinstaller.model.Defaults
 import com.jero3000.appinstaller.model.Settings
 import com.jero3000.appinstaller.platform.device.Device
@@ -22,7 +23,8 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
                           private val getAdbBinary: GetAdbBinaryUseCase,
                           private val putAdbBinary: PutAdbBinaryUseCase,
                           private val ensureAdbServerRunning: EnsureAdbServerRunningUseCase,
-                          private val isAdbSeverRunningUseCase: CheckAdbServerRunningUseCase): StateScreenModel<SettingsScreenModel.State>(State()) {
+                          private val isAdbSeverRunningUseCase: CheckAdbServerRunningUseCase,
+                          private val restoreSettings: RestoreSettingsUseCase): StateScreenModel<SettingsScreenModel.State>(State()) {
 
     data class State(
         val isLoading: Boolean = true,
@@ -30,7 +32,8 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
         val installMode : Device.InstallMode = Device.InstallMode.NORMAL,
         val adbHost : String = Defaults.ADB_HOST,
         val adbPort : Int = Defaults.ADB_PORT,
-        val adbServerRunning: Boolean = false
+        val adbServerRunning: Boolean = false,
+        val onExit: Boolean = false
     )
 
     init {
@@ -88,6 +91,10 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
                     preferences.putInt(Settings.ADB_PORT.key, event.port)
                     mutableState.update { it.copy(adbServerRunning = isAdbSeverRunningUseCase()) }
                 }
+            }
+            SettingsEvent.OnRestoreSettings -> screenModelScope.launch {
+                restoreSettings()
+                mutableState.update { it.copy(onExit = true) }
             }
         }
     }

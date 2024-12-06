@@ -9,4 +9,5 @@ interface ConfigurationRepository {
     fun getConfiguration(): AppConfig?
     fun getConfigurationFlow(): Flow<Result<AppConfig>>
     fun loadConfiguration(file: IPlatformFile)
+    suspend fun clearConfiguration()
 }
