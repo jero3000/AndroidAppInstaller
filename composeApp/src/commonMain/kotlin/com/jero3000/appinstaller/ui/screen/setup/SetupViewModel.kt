@@ -19,6 +19,7 @@ import com.jero3000.appinstaller.domain.GetPackageFileUseCase
 import com.jero3000.appinstaller.domain.InstallAppPackageUseCase
 import com.jero3000.appinstaller.domain.ResolvePackageUrlUseCase
 import com.jero3000.appinstaller.domain.StoreCredentialsUseCase
+import com.jero3000.appinstaller.model.AppConfig
 import com.jero3000.appinstaller.model.BuildVariant
 import com.jero3000.appinstaller.model.Settings
 import com.jero3000.appinstaller.model.exception.CredentialsRequiredException
@@ -56,6 +57,7 @@ class SetupViewModel(
 
     init {
         viewModelScope.launch { //Handles the app configuration loading
+            _uiState.update { it.copy(isLoading = getAppConfig() != null) }
             getAppConfigFlow().collect{ appConfigResult ->
                 appConfigResult.getOrNull()?.let { appConfig ->
                     _uiState.update { _ ->
@@ -110,8 +112,8 @@ class SetupViewModel(
             is SetupEvent.OnInstall -> viewModelScope.launch {
                 startInstall()
             }
-            is SetupEvent.OnProjectSelected -> {
-                selectProject(event.selected)
+            is SetupEvent.OnProjectSelected -> viewModelScope.launch {
+                selectProject(event.selected, getAppConfig())
             }
             is SetupEvent.OnVersionEntered -> {
                 _uiState.update { it.copy(selectedVersion = event.version) }
@@ -119,8 +121,8 @@ class SetupViewModel(
             is SetupEvent.OnSetupPackageChanged -> {
                 updatePackage(event.packageName, event.checked)
             }
-            is SetupEvent.OnTargetSelected -> {
-                selectTarget(event.selected)
+            is SetupEvent.OnTargetSelected -> viewModelScope.launch {
+                selectTarget(event.selected, getAppConfig())
             }
             is SetupEvent.OnDeviceSelected -> {
                 _uiState.update { it.copy(selectedDevice = event.selected) }
@@ -142,7 +144,7 @@ class SetupViewModel(
     }
 
     private suspend fun startDownload(version: AppVersion) {
-        val variant = getBuildVariant()
+        val variant = getBuildVariant(getAppConfig())
         val packagesSelected = _uiState.value.packages.filter { it.selected }
         val deviceManufacturer = uiState.value.selectedDevice!!.manufacturer
 
@@ -165,7 +167,7 @@ class SetupViewModel(
     }
 
     private suspend fun startInstall() {
-        val variant = getBuildVariant()
+        val variant = getBuildVariant(getAppConfig())
         val device = uiState.value.selectedDevice!!
         val packagesSelected = _uiState.value.packages.filter { it.selected }
         for(app in packagesSelected){
@@ -193,8 +195,8 @@ class SetupViewModel(
         }
     }
 
-    private fun selectProject(selected: String) {
-        getAppConfig()?.let { appConfig ->
+    private fun selectProject(selected: String, appConfig: AppConfig?) {
+        appConfig?.let {
             _uiState.update { currentState ->
                 val project = appConfig.projects.find { it.name == selected }!!
                 currentState.copy(
@@ -205,8 +207,8 @@ class SetupViewModel(
         }
     }
 
-    private fun selectTarget(selected: String) {
-        getAppConfig()?.let { appConfig ->
+    private fun selectTarget(selected: String, appConfig: AppConfig?) {
+        appConfig?.let {
             _uiState.update { currentState ->
                 val project = appConfig.projects.find { it.name == currentState.selectedProject }!!
                 val variant = project.buildVariants.find { it.name == selected }
@@ -242,9 +244,8 @@ class SetupViewModel(
         }
     }
 
-    private fun getBuildVariant(): BuildVariant {
-        val appConfig = getAppConfig()!!
-        val project = appConfig.projects.first{ it.name == _uiState.value.selectedProject}
+    private fun getBuildVariant(appConfig: AppConfig?): BuildVariant {
+        val project = appConfig!!.projects.first{ it.name == _uiState.value.selectedProject}
         return project.buildVariants.first { it.name ==  _uiState.value.selectedTarget }
     }
 
@@ -268,8 +269,8 @@ class SetupViewModel(
             val version = preferences.getString(VERSION_KEY)?.split(".")?.let { version ->
                 AppVersion(version[0], version[1], version[2], version[3].takeIf { it.isNotEmpty() })
             }
-            project?.let { selectProject(it) }
-            variant?.let { selectTarget(it) }
+            project?.let { selectProject(it, getAppConfig()) }
+            variant?.let { selectTarget(it, getAppConfig()) }
             _uiState.update { it.copy(selectedVersion = version) }
         }
     }
