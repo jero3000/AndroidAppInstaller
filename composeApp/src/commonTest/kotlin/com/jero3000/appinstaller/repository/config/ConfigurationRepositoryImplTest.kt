@@ -30,7 +30,19 @@ class ConfigurationRepositoryImplTest {
     }
 
     @Test
-    fun `First tries to load configuration from user directory`() = runTest {
+    fun `fetchConfiguration reads the config file from app data directory`() = runTest{
+        val dataSource = mock<ConfigurationDataSource>(){
+            everySuspend { getConfiguration() } returns Result.success(AppConfig(emptyList()))
+        }
+        val repository = ConfigurationRepositoryImpl(dataSource)
+
+        repository.fetchConfiguration()
+        verifySuspend { dataSource.getConfiguration() }
+        assertNotNull(repository.getConfiguration())
+    }
+
+    @Test
+    fun `First tries to load configuration from app data directory`() = runTest {
         val dataSource = mock<ConfigurationDataSource>(){
             everySuspend { getConfiguration() } returns Result.success(AppConfig(emptyList()))
         }
@@ -42,7 +54,7 @@ class ConfigurationRepositoryImplTest {
     }
 
     @Test
-    fun `If there is no configuration at user directory, the configuration is loaded when the user specifies the file to load`() = runTest {
+    fun `If there is no configuration at app data directory, the configuration is loaded when the user specifies the file to load`() = runTest {
         val dataSource = mock<ConfigurationDataSource> {
             everySuspend { getConfiguration() } returns Result.failure(Exception())
             everySuspend { loadConfiguration(any()) } returns Result.success(AppConfig(emptyList()))

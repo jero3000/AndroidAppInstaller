@@ -13,6 +13,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import com.jero3000.appinstaller.domain.DiscoverDevicesUseCase
 import com.jero3000.appinstaller.domain.EnsureAdbServerRunningUseCase
+import com.jero3000.appinstaller.domain.FetchConfigurationUseCase
 import com.jero3000.appinstaller.domain.GetAppConfigFlowUseCase
 import com.jero3000.appinstaller.domain.GetAppConfigUseCase
 import com.jero3000.appinstaller.domain.GetPackageFileUseCase
@@ -43,7 +44,8 @@ class SetupViewModel(
     private val discoverDevices: DiscoverDevicesUseCase,
     private val installPackage: InstallAppPackageUseCase,
     private val ensureAdbServerRunning: EnsureAdbServerRunningUseCase,
-    private val browserLauncher: BrowserLauncher
+    private val browserLauncher: BrowserLauncher,
+    private val fetchAppConfig: FetchConfigurationUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
     val uiState: StateFlow<SetupState> = _uiState.stateIn(
@@ -57,7 +59,7 @@ class SetupViewModel(
 
     init {
         viewModelScope.launch { //Handles the app configuration loading
-            _uiState.update { it.copy(isLoading = getAppConfig() != null) }
+            _uiState.update { it.copy(isLoading = fetchAppConfig().isSuccess) }
             getAppConfigFlow().collect{ appConfigResult ->
                 appConfigResult.getOrNull()?.let { appConfig ->
                     _uiState.update { _ ->
@@ -112,7 +114,7 @@ class SetupViewModel(
             is SetupEvent.OnInstall -> viewModelScope.launch {
                 startInstall()
             }
-            is SetupEvent.OnProjectSelected -> viewModelScope.launch {
+            is SetupEvent.OnProjectSelected -> {
                 selectProject(event.selected, getAppConfig())
             }
             is SetupEvent.OnVersionEntered -> {
@@ -121,7 +123,7 @@ class SetupViewModel(
             is SetupEvent.OnSetupPackageChanged -> {
                 updatePackage(event.packageName, event.checked)
             }
-            is SetupEvent.OnTargetSelected -> viewModelScope.launch {
+            is SetupEvent.OnTargetSelected -> {
                 selectTarget(event.selected, getAppConfig())
             }
             is SetupEvent.OnDeviceSelected -> {
@@ -269,8 +271,8 @@ class SetupViewModel(
             val version = preferences.getString(VERSION_KEY)?.split(".")?.let { version ->
                 AppVersion(version[0], version[1], version[2], version[3].takeIf { it.isNotEmpty() })
             }
-            project?.let { selectProject(it, getAppConfig()) }
-            variant?.let { selectTarget(it, getAppConfig()) }
+            project?.let { selectProject(it, appConfig) }
+            variant?.let { selectTarget(it, appConfig) }
             _uiState.update { it.copy(selectedVersion = version) }
         }
     }

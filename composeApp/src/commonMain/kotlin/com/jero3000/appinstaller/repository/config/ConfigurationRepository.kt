@@ -6,7 +6,8 @@ import com.jero3000.appinstaller.model.AppConfig
 
 
 interface ConfigurationRepository {
-    suspend fun getConfiguration(): AppConfig?
+    fun getConfiguration(): AppConfig?
+    suspend fun fetchConfiguration(): Result<AppConfig>
     fun getConfigurationFlow(): Flow<Result<AppConfig>>
     fun loadConfiguration(file: IPlatformFile)
     suspend fun clearConfiguration()

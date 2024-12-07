@@ -5,6 +5,7 @@ import com.jero3000.appinstaller.domain.ClearCacheUseCase
 import com.jero3000.appinstaller.domain.ClearCredentialsUseCase
 import com.jero3000.appinstaller.domain.DiscoverDevicesUseCase
 import com.jero3000.appinstaller.domain.EnsureAdbServerRunningUseCase
+import com.jero3000.appinstaller.domain.FetchConfigurationUseCase
 import com.jero3000.appinstaller.domain.GetAdbBinaryUseCase
 import com.jero3000.appinstaller.domain.PutAdbBinaryUseCase
 import com.jero3000.appinstaller.domain.GetAppConfigFlowUseCase
@@ -34,4 +35,5 @@ val domainModule = module {
     factoryOf(::EnsureAdbServerRunningUseCase)
     factoryOf(::CheckAdbServerRunningUseCase)
     factoryOf(::RestoreSettingsUseCase)
+    factoryOf(::FetchConfigurationUseCase)
 }

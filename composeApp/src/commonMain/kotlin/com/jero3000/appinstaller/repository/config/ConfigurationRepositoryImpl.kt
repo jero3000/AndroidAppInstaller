@@ -11,16 +11,22 @@ class ConfigurationRepositoryImpl(private val dataSource: ConfigurationDataSourc
     private val loadChannel = Channel<IPlatformFile>()
     private var appConfig: AppConfig? = null
 
-    override suspend fun getConfiguration(): AppConfig? {
-        return appConfig ?: run {
-            dataSource.getConfiguration().getOrNull()?.also {
+    override fun getConfiguration(): AppConfig? {
+        return appConfig
+    }
+
+    override suspend fun fetchConfiguration(): Result<AppConfig> {
+        return dataSource.getConfiguration().also { result ->
+            result.getOrNull()?.let {
                 appConfig = it
             }
         }
     }
 
     override fun getConfigurationFlow() = flow {
-        getConfiguration()?.let { emit(Result.success(it)) }
+        (getConfiguration() ?: fetchConfiguration().getOrNull())?.let {
+            emit(Result.success(it))
+        }
         while(true){
             val result = dataSource.loadConfiguration(loadChannel.receive())
             result.getOrNull()?.let {
