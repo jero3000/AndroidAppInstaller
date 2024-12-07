@@ -50,11 +50,11 @@ kotlin {
             }
             implementation(libs.kotlinx.coroutines.swing)
             implementation(libs.commons.net)
-            implementation(libs.multiplatform.settings)
             implementation(libs.cryptography.provider.jdk)
             implementation(libs.appdirs)
             implementation(project(":jadb:lib"))
             implementation(project(":dadb:lib"))
+            implementation(libs.awssdk.s3)
         }
 
         commonTest.dependencies {

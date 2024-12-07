@@ -17,7 +17,7 @@ import java.net.URI
 import java.nio.file.Paths
 
 
-actual class FtpFileDataSource(): FileDataSource {
+class FtpFileDataSource: FileDataSource {
     override fun supports(url: String) = URI(url).scheme == "ftp"
 
 
