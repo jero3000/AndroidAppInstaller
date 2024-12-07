@@ -1,10 +1,9 @@
 package com.jero3000.appinstaller.repository.adb
 
-import dev.zwander.kotlin.file.IPlatformFile
 import com.jero3000.appinstaller.platform.adb.AdbBinary
 import com.jero3000.appinstaller.platform.filesystem.FileUtils
-import com.jero3000.appinstaller.platform.uri.UriParser
 import com.jero3000.appinstaller.repository.preferences.ApplicationPreferences
+import dev.zwander.kotlin.file.IPlatformFile
 
 class AdbRepositoryImpl(private val preferences: ApplicationPreferences,
                         private val adbBinary: AdbBinary,

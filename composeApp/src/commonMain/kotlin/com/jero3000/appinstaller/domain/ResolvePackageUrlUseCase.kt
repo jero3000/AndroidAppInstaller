@@ -26,8 +26,8 @@ class ResolvePackageUrlUseCase {
         placeholders[DEVICE_PLACEHOLDER] = deviceManufacturer
 
         val unresolvedUrl =
-            buildVariant.location.takeIf { it.endsWith('/') }?.let { it + appPackage.path }
-                ?: (buildVariant.location + "/" + appPackage.path)
+            buildVariant.location.takeIf { it.endsWith('/') }?.let { it + appPackage.path.removePrefix("/") }
+                ?: (buildVariant.location + "/" + appPackage.path.removePrefix("/"))
         var resolvedUrl = unresolvedUrl
         placeholders.forEach { placeholder ->
             resolvedUrl = resolvedUrl.replace("{${placeholder.key}}", placeholder.value)
