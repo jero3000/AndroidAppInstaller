@@ -28,8 +28,13 @@ class AdbBinaryImpl(private val ioContext: CoroutineContext) : AdbBinary{
             .resolve("Android")
             .resolve("Sdk")
             .resolve("platform-tools")
-            .resolve(adbName)
-        if (!adbFile.exists()) throw FileNotFoundException("Adb binary cannot be found via filesystem paths")
+            .resolve(adbName).takeIf { it.exists() } ?:
+        File(appDirs.getUserDataDir(null, null, null))
+            .resolve("..")
+            .resolve("Android")
+            .resolve("sdk")
+            .resolve("platform-tools")
+            .resolve(adbName).takeIf { it.exists() } ?: throw FileNotFoundException("Adb binary cannot be found via filesystem paths")
         PlatformFile(adbFile)
     }
 
