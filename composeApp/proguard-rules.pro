@@ -11,3 +11,10 @@
 # FileKit
 -keep class com.sun.jna.** { *; }
 -keep class * implements com.sun.jna.** { *; }
+
+-dontwarn org.graalvm.**
+-dontwarn com.oracle.**
+-dontwarn android.**
+-dontwarn org.bouncycastle.**
+-dontwarn org.conscrypt.**
+-dontwarn org.openjsse.**
