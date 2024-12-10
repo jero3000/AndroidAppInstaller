@@ -60,4 +60,5 @@
     <string name="settings_restore_settings_button">Restablecer ajustes</string>
     <string name="settings_restore_settings_title_popup">Restablecer ajustes</string>
     <string name="settings_restore_settings_confirmation_message">La aplicación se cerrará. ¿Estás seguro?</string>
+    <string name="settings_file_picker_message_not_found">El ejecutable Adb no se ha encontrado</string>
 </resources>

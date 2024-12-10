@@ -28,7 +28,7 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
 
     data class State(
         val isLoading: Boolean = true,
-        val adbBinaryPath: String = "Adb binary cannot be found automatically",
+        val adbBinaryPath: String? = null,
         val installMode : Device.InstallMode = Device.InstallMode.NORMAL,
         val adbHost : String = Defaults.ADB_HOST,
         val adbPort : Int = Defaults.ADB_PORT,

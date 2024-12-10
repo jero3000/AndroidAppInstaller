@@ -11,6 +11,7 @@ import androidappinstaller.composeapp.generated.resources.settings_adb_sticker_o
 import androidappinstaller.composeapp.generated.resources.settings_back_button
 import androidappinstaller.composeapp.generated.resources.settings_clear_cache_button
 import androidappinstaller.composeapp.generated.resources.settings_clear_credentials_button
+import androidappinstaller.composeapp.generated.resources.settings_file_picker_message_not_found
 import androidappinstaller.composeapp.generated.resources.settings_install_mode
 import androidappinstaller.composeapp.generated.resources.settings_install_mode_clean
 import androidappinstaller.composeapp.generated.resources.settings_install_mode_clean_tooltip
@@ -91,7 +92,7 @@ class SettingsScreen : Screen{
                     FilePicker(
                         modifier = Modifier.padding(top = 10.dp, bottom = 20.dp),
                         stringResource(Res.string.settings_adb_binary),
-                        state.adbBinaryPath,
+                        state.adbBinaryPath ?: stringResource(Res.string.settings_file_picker_message_not_found),
                         stringResource(Res.string.settings_adb_binary_picker_button_title)
                     ) {
                         coroutineScope.launch {
