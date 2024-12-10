@@ -72,9 +72,9 @@ compose.desktop {
     application {
         buildTypes.release.proguard {
             configurationFiles.from("proguard-rules.pro")
-            obfuscate.set(false)
+            obfuscate.set(true)
             isEnabled.set(true)
-            optimize.set(false)
+            optimize.set(true)  
             version.set("7.6.0")
         }
 

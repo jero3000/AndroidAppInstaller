@@ -18,3 +18,5 @@
 -dontwarn org.bouncycastle.**
 -dontwarn org.conscrypt.**
 -dontwarn org.openjsse.**
+
+-keep class com.jero3000.appinstaller.repository.config.json.** { *; }
