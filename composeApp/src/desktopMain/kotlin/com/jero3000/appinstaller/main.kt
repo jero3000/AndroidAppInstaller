@@ -207,14 +207,21 @@ private fun FrameWindowScope.CustomMenuBar(currentLocale: AppLocale, onLoad: () 
                         })
                 }
             }
-            Separator()
-            Item(
-                stringResource(Res.string.menu_bar_help_about),
-                onClick = { onAbout() },
-                mnemonic = stringResource(Res.string.menu_bar_help_about).first()
-            )
+            if(!isMacOS()) {
+                Separator()
+                Item(
+                    stringResource(Res.string.menu_bar_help_about),
+                    onClick = { onAbout() },
+                    mnemonic = stringResource(Res.string.menu_bar_help_about).first()
+                )
+            }
         }
     }
+}
+
+private fun isMacOS(): Boolean {
+    val osName = System.getProperty("os.name").lowercase()
+    return osName.contains("mac") || osName.contains("darwin")
 }
 
 @Composable
