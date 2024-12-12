@@ -1,6 +1,5 @@
-package com.jero3000.appinstaller.repository.domain
+package com.jero3000.appinstaller.domain
 
-import com.jero3000.appinstaller.domain.EnsureAdbServerRunningUseCase
 import com.jero3000.appinstaller.model.Settings
 import com.jero3000.appinstaller.platform.adb.AdbBinary
 import com.jero3000.appinstaller.repository.adb.AdbRepository

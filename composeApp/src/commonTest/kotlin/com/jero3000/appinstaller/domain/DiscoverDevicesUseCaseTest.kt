@@ -1,6 +1,5 @@
-package com.jero3000.appinstaller.repository.domain
+package com.jero3000.appinstaller.domain
 
-import com.jero3000.appinstaller.domain.DiscoverDevicesUseCase
 import com.jero3000.appinstaller.platform.device.Device
 import com.jero3000.appinstaller.platform.device.DeviceManager
 import dev.mokkery.answering.returnsSuccess

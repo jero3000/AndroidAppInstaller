@@ -1,6 +1,5 @@
-package com.jero3000.appinstaller.repository.domain
+package com.jero3000.appinstaller.domain
 
-import com.jero3000.appinstaller.domain.RestoreSettingsUseCase
 import com.jero3000.appinstaller.repository.config.ConfigurationRepository
 import com.jero3000.appinstaller.repository.preferences.ApplicationPreferences
 import dev.mokkery.MockMode
