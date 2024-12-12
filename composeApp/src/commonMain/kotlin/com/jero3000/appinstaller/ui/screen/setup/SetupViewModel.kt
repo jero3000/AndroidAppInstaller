@@ -2,15 +2,6 @@ package com.jero3000.appinstaller.ui.screen.setup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import com.jero3000.appinstaller.domain.DiscoverDevicesUseCase
 import com.jero3000.appinstaller.domain.EnsureAdbServerRunningUseCase
 import com.jero3000.appinstaller.domain.FetchConfigurationUseCase
@@ -21,6 +12,7 @@ import com.jero3000.appinstaller.domain.InstallAppPackageUseCase
 import com.jero3000.appinstaller.domain.ResolvePackageUrlUseCase
 import com.jero3000.appinstaller.domain.StoreCredentialsUseCase
 import com.jero3000.appinstaller.model.AppConfig
+import com.jero3000.appinstaller.model.AppVersion
 import com.jero3000.appinstaller.model.BuildVariant
 import com.jero3000.appinstaller.model.Settings
 import com.jero3000.appinstaller.model.exception.CredentialsRequiredException
@@ -29,7 +21,13 @@ import com.jero3000.appinstaller.repository.preferences.ApplicationPreferences
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupEvent
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupPackage
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupState
-import com.jero3000.appinstaller.model.AppVersion
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -54,8 +52,8 @@ class SetupViewModel(
         initialValue = SetupState()
     )
     private var scanJob : Job? = null
-    private var configurationLoaded: Continuation<Unit>? = null
-    private val mutex = Mutex()
+    private var configurationWaitCondition: Continuation<Unit>? = null
+    private var configurationLoaded = false
 
     init {
         viewModelScope.launch { //Handles the app configuration loading
@@ -66,10 +64,11 @@ class SetupViewModel(
                         SetupState(projects = appConfig.projects.map { it.name })
                     }
                     readPreferences()
-                    configurationLoaded?.resume(Unit)
-                    mutex.withLock {
-                        _uiState.update { it.copy(isLoading = false) }
-                    }
+                    val adbError = ensureAdbServerRunning().exceptionOrNull()?.let { SetupState.Error.AdbBinaryNotFound }
+                    configurationLoaded =  true
+                    configurationWaitCondition?.resume(Unit)
+                    configurationWaitCondition = null
+                    _uiState.update { it.copy(isLoading = false, error = adbError) }
                 } ?: run {
                     //Notify the error loading the app config
                     appConfigResult.exceptionOrNull()?.let { notifyGenericError(it) }
@@ -82,16 +81,13 @@ class SetupViewModel(
         when(event){
             is SetupEvent.OnStart -> {
                 scanJob = viewModelScope.launch { //Handles the Android device discovery
-                    val isLoading = mutex.withLock { _uiState.value.isLoading }
-                    if(isLoading) {
+                    if(!configurationLoaded) {
                         //Waits for configuration loaded to start the devices discovery
                         suspendCoroutine { continuation ->
-                            configurationLoaded = continuation
+                            configurationWaitCondition = continuation
                         }
                     }
-                    ensureAdbServerRunning().exceptionOrNull()?.let {
-                        _uiState.update { it.copy(error = SetupState.Error.AdbBinaryNotFound) }
-                    }
+
                     discoverDevices().collect{ devices ->
                         _uiState.update { it.copy(devices = devices) }
                     }
