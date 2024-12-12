@@ -11,4 +11,5 @@ sealed class SettingsEvent {
     data class OnAdbBinaryConfigured(val binary: IPlatformFile) : SettingsEvent()
     data class OnNewAdbHost(val host: String) : SettingsEvent()
     data class OnNewAdbPort(val port: Int) : SettingsEvent()
+    data class OnSaveCredentialsChanged(val save: Boolean): SettingsEvent()
 }

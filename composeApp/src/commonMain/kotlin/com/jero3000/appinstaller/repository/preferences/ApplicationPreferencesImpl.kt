@@ -27,6 +27,14 @@ class ApplicationPreferencesImpl(context: String,
         settings.getIntOrNull(key)
     }
 
+    override suspend fun putBoolean(key: String, data: Boolean) {
+        settings.putBoolean(key, data)
+    }
+
+    override suspend fun getBoolean(key: String): Boolean? {
+        return settings.getBooleanOrNull(key)
+    }
+
     override suspend fun remove(key: String) = withContext(ioContext){
         settings.remove(key)
     }

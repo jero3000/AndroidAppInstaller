@@ -61,4 +61,5 @@
     <string name="settings_restore_settings_title_popup">Restore settings</string>
     <string name="settings_restore_settings_confirmation_message">Application will be closed. Are you sure?</string>
     <string name="settings_file_picker_message_not_found">Adb binary cannot be found automatically</string>
+    <string name="settings_save_credentials_switch">Save FTP credentials</string>
 </resources>

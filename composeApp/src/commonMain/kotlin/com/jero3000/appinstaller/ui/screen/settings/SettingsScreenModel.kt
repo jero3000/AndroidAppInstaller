@@ -33,6 +33,7 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
         val adbHost : String = Defaults.ADB_HOST,
         val adbPort : Int = Defaults.ADB_PORT,
         val adbServerRunning: Boolean = false,
+        val saveCredentials: Boolean = false,
         val onExit: Boolean = false
     )
 
@@ -53,6 +54,10 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
 
             preferences.getInt(Settings.ADB_PORT.key)?.let { port ->
                 mutableState.update { it.copy(adbPort = port) }
+            }
+
+            preferences.getBoolean(Settings.SAVE_CREDENTIALS.key)?.let { save ->
+                mutableState.update { it.copy(saveCredentials = save) }
             }
 
             mutableState.update { it.copy(adbServerRunning = isAdbSeverRunningUseCase(), isLoading = false) }
@@ -95,6 +100,11 @@ class SettingsScreenModel(private val clearCredentials: ClearCredentialsUseCase,
             SettingsEvent.OnRestoreSettings -> screenModelScope.launch {
                 restoreSettings()
                 mutableState.update { it.copy(onExit = true) }
+            }
+
+            is SettingsEvent.OnSaveCredentialsChanged -> screenModelScope.launch {
+                preferences.putBoolean(Settings.SAVE_CREDENTIALS.key, event.save)
+                mutableState.update { state -> state.copy(saveCredentials = event.save) }
             }
         }
     }

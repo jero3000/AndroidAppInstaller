@@ -4,7 +4,8 @@ enum class Settings(val key: String) {
     INSTALL_MODE("install_mode"),
     ADB_HOST("adb_host"),
     ADB_PORT("adb_port"),
-    LANGUAGE("language")
+    LANGUAGE("language"),
+    SAVE_CREDENTIALS("save_credentials")
 }
 
 object Defaults{

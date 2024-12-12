@@ -14,7 +14,7 @@ import com.jero3000.appinstaller.repository.credential.json.toCredential
 import com.jero3000.appinstaller.repository.credential.json.toCredentialDto
 import kotlin.coroutines.CoroutineContext
 
-class CredentialPreferencesDataSource(settingsFactory: Settings.Factory, private val ioContext: CoroutineContext): CredentialDataSource {
+class PreferencesCredentialDataSource(settingsFactory: Settings.Factory, private val ioContext: CoroutineContext): CredentialDataSource {
 
     private val settings =  settingsFactory.create("com.jero3000.appinstaller.credentials")
 

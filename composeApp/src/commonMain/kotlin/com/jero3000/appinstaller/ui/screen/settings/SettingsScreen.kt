@@ -22,7 +22,9 @@ import androidappinstaller.composeapp.generated.resources.settings_install_mode_
 import androidappinstaller.composeapp.generated.resources.settings_restore_settings_button
 import androidappinstaller.composeapp.generated.resources.settings_restore_settings_confirmation_message
 import androidappinstaller.composeapp.generated.resources.settings_restore_settings_title_popup
+import androidappinstaller.composeapp.generated.resources.settings_save_credentials_switch
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +33,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -46,6 +49,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -64,6 +69,7 @@ import dev.zwander.kotlin.file.filekit.toKmpFile
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 class SettingsScreen : Screen{
@@ -151,7 +157,18 @@ class SettingsScreen : Screen{
                         val installMode = Device.InstallMode.entries.first { it.key == mode.key }
                         screenModel.onEvent(SettingsEvent.OnInstallModeChanged(installMode))
                     }
-                    Row(modifier = Modifier.padding(top = 20.dp)) {
+                    Row(modifier = Modifier.padding(top = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically){
+                        Switch(
+                            modifier = Modifier.semantics { contentDescription = "App to install" }
+                                .padding(end = 15.dp),
+                            checked = state.saveCredentials,
+                            onCheckedChange = { screenModel.onEvent(SettingsEvent.OnSaveCredentialsChanged(it)) }
+                        )
+                        Text(stringResource(Res.string.settings_save_credentials_switch))
+                    }
+                    Row(modifier = Modifier.padding(top = 10.dp)) {
                         AnimatedButton(text = stringResource(Res.string.settings_clear_credentials_button)) {
                             screenModel.onEvent(SettingsEvent.OnClearCredentials)
                         }

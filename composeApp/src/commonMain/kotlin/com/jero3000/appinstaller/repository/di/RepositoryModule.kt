@@ -11,7 +11,9 @@ import com.jero3000.appinstaller.repository.config.ConfigurationRepositoryImpl
 import com.jero3000.appinstaller.repository.credential.CredentialRepository
 import com.jero3000.appinstaller.repository.credential.CredentialRepositoryImpl
 import com.jero3000.appinstaller.repository.credential.datasource.CredentialDataSource
-import com.jero3000.appinstaller.repository.credential.datasource.CredentialPreferencesDataSource
+import com.jero3000.appinstaller.repository.credential.datasource.MemoryCredentialDataSource
+import com.jero3000.appinstaller.repository.credential.datasource.PersistenceSwitcher
+import com.jero3000.appinstaller.repository.credential.datasource.PreferencesCredentialDataSource
 import com.jero3000.appinstaller.repository.file.FileRepository
 import com.jero3000.appinstaller.repository.file.FileRepositoryImpl
 import com.jero3000.appinstaller.repository.file.datasource.FileDataSource
@@ -44,10 +46,24 @@ val repositoryModule = module {
     }
     single<FileRepository> { FileRepositoryImpl(get<FileDataSource>(named("resolver")), get(), get(), get(), get()) }
 
-    factory<CredentialDataSource> { CredentialPreferencesDataSource(get(), Dispatchers.IO) }
-    single<CredentialRepository> { CredentialRepositoryImpl(get()) }
-
     single<ApplicationPreferences> { ApplicationPreferencesImpl("com.jero3000.appinstaller.preferences", get(), Dispatchers.IO) }
+
+    factory<CredentialDataSource> { PreferencesCredentialDataSource(get(), Dispatchers.IO) } withOptions {
+        named("diskCredentials")
+    }
+    factory<CredentialDataSource> { MemoryCredentialDataSource() } withOptions {
+        named("memoryCredentials")
+    }
+    factory<CredentialDataSource> { PersistenceSwitcher(
+        diskDataSource = get<CredentialDataSource>(named("diskCredentials")),
+        memoryDataSource = get<CredentialDataSource>(named("memoryCredentials")),
+        preferences = get())
+    } withOptions {
+        named("persistenceSwitcher")
+    }
+
+    single<CredentialRepository> { CredentialRepositoryImpl(get<CredentialDataSource>(named("persistenceSwitcher"))) }
+
     singleOf(::AdbRepositoryImpl) { bind<AdbRepository>() }
 }
 
