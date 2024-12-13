@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindow
@@ -51,11 +52,8 @@ import cafe.adriel.voyager.jetpack.ProvideNavigatorLifecycleKMPSupport
 import cafe.adriel.voyager.navigator.CurrentScreen
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.NavigatorContent
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import com.jero3000.appinstaller.di.appModule
 import com.jero3000.appinstaller.model.Settings
-import com.jero3000.appinstaller.platform.intent.BrowserLauncher
 import com.jero3000.appinstaller.platform.localization.AppLocale
 import com.jero3000.appinstaller.platform.localization.LocaleManager
 import com.jero3000.appinstaller.platform.localization.LocalizedApp
@@ -65,6 +63,8 @@ import com.jero3000.appinstaller.ui.screen.Application
 import com.jero3000.appinstaller.ui.screen.MenuActions
 import com.jero3000.appinstaller.ui.screen.settings.SettingsScreen
 import com.jero3000.appinstaller.ui.screen.setup.SetupScreen
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.context.startKoin
@@ -160,7 +160,12 @@ private fun NestedNavigation(
 }
 
 @Composable
-private fun FrameWindowScope.CustomMenuBar(currentLocale: AppLocale, onLoad: () -> Unit, onSettings: () -> Unit, onNewLocale: (locale: AppLocale) -> Unit, onAbout: () -> Unit, onExit: () -> Unit){
+private fun FrameWindowScope.CustomMenuBar(currentLocale: AppLocale,
+                                           onLoad: () -> Unit,
+                                           onSettings: () -> Unit,
+                                           onNewLocale: (locale: AppLocale) -> Unit,
+                                           onAbout: () -> Unit,
+                                           onExit: () -> Unit){
     MenuBar {
         Menu(stringResource(Res.string.menu_bar_file), mnemonic = stringResource(Res.string.menu_bar_file_mnemonic).first()) {
             Item(
@@ -189,11 +194,11 @@ private fun FrameWindowScope.CustomMenuBar(currentLocale: AppLocale, onLoad: () 
             )
         }
         Menu(stringResource(Res.string.menu_bar_help), mnemonic = stringResource(Res.string.menu_bar_help_mnemonic).first()) {
+            val uriHandler = LocalUriHandler.current
             Item(
                 stringResource(Res.string.menu_bar_help_licenses),
                 onClick = {
-                    val browser: BrowserLauncher by inject(BrowserLauncher::class.java)
-                    browser.launchUrl("https://raw.githubusercontent.com/jero3000/AndroidAppInstaller/refs/heads/master/LICENSE")
+                    uriHandler.openUri("https://raw.githubusercontent.com/jero3000/AndroidAppInstaller/refs/heads/master/LICENSE")
                 },
                 mnemonic = stringResource(Res.string.menu_bar_help_licenses_mnemonic).first()
             )

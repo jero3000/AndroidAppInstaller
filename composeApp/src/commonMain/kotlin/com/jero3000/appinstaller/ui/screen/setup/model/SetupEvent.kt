@@ -16,5 +16,4 @@ sealed class SetupEvent{
     data object OnInstall: SetupEvent()
     data object OnErrorAck: SetupEvent()
     data class OnNewCredential(val host: String, val credential: Credential): SetupEvent()
-    data class OnLinkClicked(val link: String): SetupEvent()
 }

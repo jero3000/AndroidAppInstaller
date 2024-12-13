@@ -16,7 +16,6 @@ import com.jero3000.appinstaller.model.AppVersion
 import com.jero3000.appinstaller.model.BuildVariant
 import com.jero3000.appinstaller.model.Settings
 import com.jero3000.appinstaller.model.exception.CredentialsRequiredException
-import com.jero3000.appinstaller.platform.intent.BrowserLauncher
 import com.jero3000.appinstaller.repository.preferences.ApplicationPreferences
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupEvent
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupPackage
@@ -42,7 +41,6 @@ class SetupViewModel(
     private val discoverDevices: DiscoverDevicesUseCase,
     private val installPackage: InstallAppPackageUseCase,
     private val ensureAdbServerRunning: EnsureAdbServerRunningUseCase,
-    private val browserLauncher: BrowserLauncher,
     private val fetchAppConfig: FetchConfigurationUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SetupState())
@@ -134,9 +132,6 @@ class SetupViewModel(
                 _uiState.value.selectedVersion?.let {
                     startDownload(it)
                 }
-            }
-            is SetupEvent.OnLinkClicked -> {
-                browserLauncher.launchUrl(event.link)
             }
         }
     }
