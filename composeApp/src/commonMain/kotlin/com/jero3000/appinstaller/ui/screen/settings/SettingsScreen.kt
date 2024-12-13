@@ -10,7 +10,9 @@ import androidappinstaller.composeapp.generated.resources.settings_adb_sticker_f
 import androidappinstaller.composeapp.generated.resources.settings_adb_sticker_ok
 import androidappinstaller.composeapp.generated.resources.settings_back_button
 import androidappinstaller.composeapp.generated.resources.settings_clear_cache_button
+import androidappinstaller.composeapp.generated.resources.settings_clear_cache_tooltip
 import androidappinstaller.composeapp.generated.resources.settings_clear_credentials_button
+import androidappinstaller.composeapp.generated.resources.settings_clear_credentials_tooltip
 import androidappinstaller.composeapp.generated.resources.settings_file_picker_message_not_found
 import androidappinstaller.composeapp.generated.resources.settings_install_mode
 import androidappinstaller.composeapp.generated.resources.settings_install_mode_clean
@@ -22,6 +24,7 @@ import androidappinstaller.composeapp.generated.resources.settings_install_mode_
 import androidappinstaller.composeapp.generated.resources.settings_restore_settings_button
 import androidappinstaller.composeapp.generated.resources.settings_restore_settings_confirmation_message
 import androidappinstaller.composeapp.generated.resources.settings_restore_settings_title_popup
+import androidappinstaller.composeapp.generated.resources.settings_restore_settings_tooltip
 import androidappinstaller.composeapp.generated.resources.settings_save_credentials_switch
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -169,18 +172,22 @@ class SettingsScreen : Screen{
                         Text(stringResource(Res.string.settings_save_credentials_switch))
                     }
                     Row(modifier = Modifier.padding(top = 10.dp)) {
-                        AnimatedButton(text = stringResource(Res.string.settings_clear_credentials_button)) {
+                        AnimatedButton(enabled = state.saveCredentials,
+                            text = stringResource(Res.string.settings_clear_credentials_button),
+                            tooltip = stringResource(Res.string.settings_clear_credentials_tooltip)) {
                             screenModel.onEvent(SettingsEvent.OnClearCredentials)
                         }
-                        AnimatedButton(
+                        AnimatedButton(enabled = true,
                             modifier = Modifier.padding(start = 10.dp),
-                            text = stringResource(Res.string.settings_clear_cache_button)
+                            text = stringResource(Res.string.settings_clear_cache_button),
+                            tooltip = stringResource(Res.string.settings_clear_cache_tooltip)
                         ) {
                             screenModel.onEvent(SettingsEvent.OnClearCache)
                         }
-                        AnimatedButton(
+                        AnimatedButton(enabled = true,
                             modifier = Modifier.padding(start = 10.dp),
-                            text = stringResource(Res.string.settings_restore_settings_button)
+                            text = stringResource(Res.string.settings_restore_settings_button),
+                            tooltip = stringResource(Res.string.settings_restore_settings_tooltip)
                         ) {
                             restoreSettingsConfirmation = true
                         }

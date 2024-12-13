@@ -62,4 +62,7 @@
     <string name="settings_restore_settings_confirmation_message">La aplicación se cerrará. ¿Estás seguro?</string>
     <string name="settings_file_picker_message_not_found">El ejecutable Adb no se ha encontrado</string>
     <string name="settings_save_credentials_switch">Guardar credenciales FTP</string>
+    <string name="settings_clear_credentials_tooltip">Borra las credenciales guardadas en persistencia</string>
+    <string name="settings_clear_cache_tooltip">Borra la cache de descargas</string>
+    <string name="settings_restore_settings_tooltip">Reestablece los ajustes por defecto de la aplicación, la aplicación se cierra y los ajustes tendrán efecto en el siguiente ejecución de la aplicación</string>
 </resources>

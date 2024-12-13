@@ -62,4 +62,7 @@
     <string name="settings_restore_settings_confirmation_message">Application will be closed. Are you sure?</string>
     <string name="settings_file_picker_message_not_found">Adb binary cannot be found automatically</string>
     <string name="settings_save_credentials_switch">Save FTP credentials</string>
+    <string name="settings_clear_credentials_tooltip">Clears the credentials stored in persistence</string>
+    <string name="settings_clear_cache_tooltip">Clears the download cache</string>
+    <string name="settings_restore_settings_tooltip">Restores the default settings of the application, the application is closed and the changes will take effect at the next startup</string>
 </resources>
