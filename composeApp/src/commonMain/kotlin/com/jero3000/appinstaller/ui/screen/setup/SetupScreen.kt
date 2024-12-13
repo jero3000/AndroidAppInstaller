@@ -46,14 +46,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
@@ -244,29 +247,24 @@ class SetupScreen: Screen {
                 }
 
                 SetupState.Error.AdbBinaryNotFound -> {
-                    val annotatedString = buildAnnotatedString {
-                        append(stringResource(Res.string.setup_install_message1))
-                        withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-                            pushStringAnnotation(tag = "URL", annotation = "https://developer.android.com/studio/releases/platform-tools")
-                            append(stringResource(Res.string.setup_install_message2))
-                            pop()
-                        }
-                        append(stringResource(Res.string.setup_install_message3))
-                    }
-
-
                     CustomAlertDialog(
                         title = stringResource(Res.string.setup_no_adb_message),
                         text = {
-                            ClickableText(
-                                text = annotatedString,
-                                onClick = { offset ->
-                                    annotatedString.getStringAnnotations("URL", offset, offset).firstOrNull()?.let { annotation ->
-                                        // Handle the click, open the URL
-                                        viewModel.onEvent(SetupEvent.OnLinkClicked(annotation.item))
-                                    }
+                            Text(buildAnnotatedString {
+                                append(stringResource(Res.string.setup_install_message1))
+                                withLink(
+                                    LinkAnnotation.Url(
+                                        url = "https://developer.android.com/studio/releases/platform-tools",
+                                        styles = TextLinkStyles(style = SpanStyle(
+                                            color = MaterialTheme.colorScheme.primary,
+                                            textDecoration = TextDecoration.Underline
+                                        ))
+                                    )
+                                ) {
+                                    append(stringResource(Res.string.setup_install_message2))
                                 }
-                            )
+                                append(stringResource(Res.string.setup_install_message3))
+                            })
                         },
                         buttonText = stringResource(Res.string.setup_settings_button), {}) {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
