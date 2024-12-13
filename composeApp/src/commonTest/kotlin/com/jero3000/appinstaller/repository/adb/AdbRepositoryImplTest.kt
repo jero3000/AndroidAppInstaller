@@ -25,7 +25,7 @@ class AdbRepositoryImplTest {
         }
         val adbBinary = mock<AdbBinary>()
         val fileUtils = mock<FileUtils>{
-            every { getFileFromPath(any(), any()) } returns mock(){
+            every { getFileFromPath(any(), any()) } returns mock{
                 every { getExists() } returns true
             }
         }

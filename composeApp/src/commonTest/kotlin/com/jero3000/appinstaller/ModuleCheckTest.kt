@@ -9,19 +9,15 @@ import org.koin.test.verify.verify
 import kotlin.test.Test
 
 class Simple {
-    class ComponentA {
+    class ComponentA
 
-    }
-
-    class ComponentB(a: Simple.ComponentA) {
-
-    }
+    class ComponentB
 }
 
 class ModuleCheckTest {
     // given a definition with an injected definition
-    val module = module {
-        single { (a: Simple.ComponentA) -> Simple.ComponentB(a) }
+    private val module = module {
+        single { (_: Simple.ComponentA) -> Simple.ComponentB() }
     }
 
     @Test

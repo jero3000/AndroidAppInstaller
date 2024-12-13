@@ -5,7 +5,7 @@ import com.jero3000.appinstaller.model.AppPackage
 import com.jero3000.appinstaller.model.BuildVariant
 import com.jero3000.appinstaller.model.Project
 
-fun com.jero3000.appinstaller.repository.config.json.AppPackageDto.toAppPackage() =  AppPackage(
+fun AppPackageDto.toAppPackage() =  AppPackage(
     name,
     packageName,
     path

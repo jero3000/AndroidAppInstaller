@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import com.jero3000.appinstaller.utils.runSecure
 import kotlin.coroutines.CoroutineContext
 
+@Suppress("unused")
 class DadbDeviceManager(private val ioContext: CoroutineContext) : DeviceManager {
 
     private val availableDevices = mutableMapOf<String, Device>()

@@ -72,7 +72,6 @@ import dev.zwander.kotlin.file.filekit.toKmpFile
 import io.github.vinceglb.filekit.core.FileKit
 import io.github.vinceglb.filekit.core.PickerMode
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getString
 import org.jetbrains.compose.resources.stringResource
 
 class SettingsScreen : Screen{

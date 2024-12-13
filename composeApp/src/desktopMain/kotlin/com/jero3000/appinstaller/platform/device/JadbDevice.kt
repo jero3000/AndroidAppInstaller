@@ -1,16 +1,14 @@
 package com.jero3000.appinstaller.platform.device
 
-import dev.zwander.kotlin.file.IPlatformFile
+import com.jero3000.appinstaller.model.AppPackage
+import com.jero3000.appinstaller.utils.runSecure
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import com.jero3000.appinstaller.model.AppPackage
-import com.jero3000.appinstaller.utils.runSecure
 import se.vidstige.jadb.JadbDevice
 import se.vidstige.jadb.Stream
 import se.vidstige.jadb.managers.PackageManager
 import se.vidstige.jadb.managers.PackageManager.ALLOW_VERSION_DOWNGRADE
-import se.vidstige.jadb.managers.PackageManager.InstallOption
 import java.io.File
 import java.nio.charset.StandardCharsets
 import kotlin.coroutines.CoroutineContext

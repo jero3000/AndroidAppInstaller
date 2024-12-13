@@ -7,5 +7,5 @@ data class BuildVariantDto(
     val name: String,
     val location: String,
     val deviceMap: Map<String, String> = emptyMap(),
-    val packages: List<com.jero3000.appinstaller.repository.config.json.AppPackageDto>
+    val packages: List<AppPackageDto>
 )

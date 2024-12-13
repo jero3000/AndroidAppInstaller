@@ -1,12 +1,11 @@
 package com.jero3000.appinstaller.platform.device
 
+import com.jero3000.appinstaller.model.AppPackage
+import com.jero3000.appinstaller.utils.runSecure
 import dadb.Dadb
-import dev.zwander.kotlin.file.IPlatformFile
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import com.jero3000.appinstaller.model.AppPackage
-import com.jero3000.appinstaller.utils.runSecure
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 

@@ -31,7 +31,7 @@ class ConfigurationRepositoryImplTest {
 
     @Test
     fun `fetchConfiguration reads the config file from app data directory`() = runTest{
-        val dataSource = mock<ConfigurationDataSource>(){
+        val dataSource = mock<ConfigurationDataSource>{
             everySuspend { getConfiguration() } returns Result.success(AppConfig(emptyList()))
         }
         val repository = ConfigurationRepositoryImpl(dataSource)
@@ -43,7 +43,7 @@ class ConfigurationRepositoryImplTest {
 
     @Test
     fun `First tries to load configuration from app data directory`() = runTest {
-        val dataSource = mock<ConfigurationDataSource>(){
+        val dataSource = mock<ConfigurationDataSource>{
             everySuspend { getConfiguration() } returns Result.success(AppConfig(emptyList()))
         }
         val repository = ConfigurationRepositoryImpl(dataSource)

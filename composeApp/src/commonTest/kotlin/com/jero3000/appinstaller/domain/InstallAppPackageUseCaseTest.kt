@@ -44,7 +44,7 @@ class InstallAppPackageUseCaseTest {
             everySuspend { getDevice(any()) } returns device
         }
         val installPackage = InstallAppPackageUseCase(deviceManager)
-        val pkg = AppPackage("", "", "", mock(){
+        val pkg = AppPackage("", "", "", mock{
             every { getExists() } returns true
         })
         installPackage("serial", pkg, Device.InstallMode.DOWNGRADE.key)

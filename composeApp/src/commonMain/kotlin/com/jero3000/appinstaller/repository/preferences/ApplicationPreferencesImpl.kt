@@ -1,7 +1,6 @@
 package com.jero3000.appinstaller.repository.preferences
 
 import com.russhwolf.settings.Settings
-import com.russhwolf.settings.get
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 

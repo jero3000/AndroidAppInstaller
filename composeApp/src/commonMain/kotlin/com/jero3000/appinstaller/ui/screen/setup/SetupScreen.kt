@@ -34,7 +34,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -53,7 +52,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -61,6 +59,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.jero3000.appinstaller.model.AppVersion
 import com.jero3000.appinstaller.model.Credential
 import com.jero3000.appinstaller.ui.component.AppRow
 import com.jero3000.appinstaller.ui.component.CredentialsDialog
@@ -72,7 +71,6 @@ import com.jero3000.appinstaller.ui.screen.settings.SettingsScreen
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupEvent
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupPackage
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupState
-import com.jero3000.appinstaller.model.AppVersion
 import com.jero3000.appinstaller.ui.theme.CustomTheme
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel

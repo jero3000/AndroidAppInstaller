@@ -7,6 +7,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +35,7 @@ fun DropDownRow(modifier: Modifier = Modifier,
                 // The `menuAnchor` modifier must be passed to the text field to handle
                 // expanding/collapsing the menu on click. A read-only text field has
                 // the anchor type `PrimaryNotEditable`.
-                modifier = Modifier.menuAnchor(),
+                modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 value = text,
                 textStyle = MaterialTheme.typography.labelLarge,
                 onValueChange = {},
