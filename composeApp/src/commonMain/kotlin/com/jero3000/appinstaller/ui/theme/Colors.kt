@@ -1,4 +1,4 @@
-package com.jero3000.appinstaller.theme
+package com.jero3000.appinstaller.ui.theme
 
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.staticCompositionLocalOf
