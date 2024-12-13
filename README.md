@@ -36,7 +36,9 @@ If you use AWS S3 to store the application packages, then ASW CLI must be proper
 
 Here the main sreen once the configuration file was loaded:
 
-![main_screen](https://github.com/user-attachments/assets/c26aef1a-38ed-4c2c-af81-9750b6b972ac)
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/c26aef1a-38ed-4c2c-af81-9750b6b972ac" alt="Main appliction screenshot" />
+</div>
 
 The description for each input:
 - **Project**: allows to select a project: projects are configured in the JSON configuration file
