@@ -36,7 +36,9 @@ If you use AWS S3 to store the application packages, then ASW CLI must be proper
 
 Here the main sreen once the configuration file was loaded:
 
-Here the description for each input:
+![main_screen](https://github.com/user-attachments/assets/c26aef1a-38ed-4c2c-af81-9750b6b972ac)
+
+The description for each input:
 - **Project**: allows to select a project: projects are configured in the JSON configuration file
 - **Target**: allows to select a target/variant: targets are configured in the JSON configuration file
 - **Version**: specifies the version number for the package to download (build number is optional)
