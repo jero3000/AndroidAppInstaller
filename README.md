@@ -37,7 +37,7 @@ If you use AWS S3 to store the application packages, then ASW CLI must be proper
 Here the main sreen once the configuration file was loaded:
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/c26aef1a-38ed-4c2c-af81-9750b6b972ac" alt="Main appliction screenshot" />
+  <img src="https://github.com/user-attachments/assets/75017f52-a977-43c1-b7bb-a44ff95e6d45" alt="Main appliction screenshot" />
 </div>
 
 The description for each input:
