@@ -4,7 +4,7 @@ data class SetupPackage(
     val name: String,
     val packageName: String,
     val state: State = State.Idle,
-    val selected: Boolean = true
+    val selected: Boolean = false
 ){
     enum class State {
         Idle,
