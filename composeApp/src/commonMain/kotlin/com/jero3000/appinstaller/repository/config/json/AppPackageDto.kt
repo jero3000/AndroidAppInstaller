@@ -7,4 +7,5 @@ data class AppPackageDto(
     val name : String,
     val packageName: String,
     val path: String,
+    val altPath: Map<String, String> = emptyMap(),
 )

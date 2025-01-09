@@ -8,7 +8,8 @@ import com.jero3000.appinstaller.model.Project
 fun AppPackageDto.toAppPackage() =  AppPackage(
     name,
     packageName,
-    path
+    path,
+    altPath
 )
 
 fun BuildVariantDto.toBuildVariant() = BuildVariant(

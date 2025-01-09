@@ -20,7 +20,7 @@ class InstallAppPackageUseCaseTest {
     fun `If no device is found then a failed result is returned`() = runTest{
         val deviceManager = mock<DeviceManager>(MockMode.autofill)
         val installPackage = InstallAppPackageUseCase(deviceManager)
-        val pkg = AppPackage("", "", "", null)
+        val pkg = AppPackage("", "", "", emptyMap(),null)
         val result = installPackage("serial", pkg, Device.InstallMode.DOWNGRADE.key)
         assertTrue(result.isFailure)
     }
@@ -31,7 +31,7 @@ class InstallAppPackageUseCaseTest {
             everySuspend { getDevice(any()) } returns mock()
         }
         val installPackage = InstallAppPackageUseCase(deviceManager)
-        val pkg = AppPackage("", "", "", null)
+        val pkg = AppPackage("", "", "", emptyMap(), null)
         val result = installPackage("serial", pkg, Device.InstallMode.DOWNGRADE.key)
         assertTrue(result.isFailure)
     }
@@ -44,7 +44,7 @@ class InstallAppPackageUseCaseTest {
             everySuspend { getDevice(any()) } returns device
         }
         val installPackage = InstallAppPackageUseCase(deviceManager)
-        val pkg = AppPackage("", "", "", mock{
+        val pkg = AppPackage("", "", "", emptyMap(), mock{
             every { getExists() } returns true
         })
         installPackage("serial", pkg, Device.InstallMode.DOWNGRADE.key)
