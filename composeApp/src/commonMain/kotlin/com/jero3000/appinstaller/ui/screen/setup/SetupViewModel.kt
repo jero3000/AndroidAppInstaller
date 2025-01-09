@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeoutException
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -62,7 +63,13 @@ class SetupViewModel(
                         SetupState(projects = appConfig.projects.map { it.name })
                     }
                     readPreferences()
-                    val adbError = ensureAdbServerRunning().exceptionOrNull()?.let { SetupState.Error.AdbBinaryNotFound }
+                    val adbError = ensureAdbServerRunning().exceptionOrNull()?.let {
+                        if(it is TimeoutException){
+                            SetupState.Error.AdbServerTimeout
+                        } else {
+                            SetupState.Error.AdbBinaryNotFound
+                        }
+                    }
                     configurationLoaded =  true
                     configurationWaitCondition?.resume(Unit)
                     configurationWaitCondition = null

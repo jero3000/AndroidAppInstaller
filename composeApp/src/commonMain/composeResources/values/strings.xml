@@ -33,6 +33,8 @@
     <string name="setup_install_message2">ADB tool</string>
     <string name="setup_install_message3"> or configure the correct ADB path in the settings</string>
     <string name="setup_no_adb_message">Android Debug Bridge (adb) executable not found</string>
+    <string name="setup_adb_server_timeout">Android Debug Bridge (adb) server unresponsive</string>
+    <string name="setup_adb_server_timeout_message">Try to re-start the server manually from command-line: adb kill-server &amp;&amp; adb start-server</string>
     <string name="setup_settings_button">Go to settings</string>
     <string name="setup_package_idle">Idle</string>
     <string name="setup_package_downloading">Downloading...</string>

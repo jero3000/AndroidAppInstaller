@@ -19,5 +19,6 @@ data class SetupState(
         data class GenericError(val description: String): Error
         data class CredentialsRequired(val host: String): Error
         data object AdbBinaryNotFound: Error
+        data object AdbServerTimeout: Error
     }
 }

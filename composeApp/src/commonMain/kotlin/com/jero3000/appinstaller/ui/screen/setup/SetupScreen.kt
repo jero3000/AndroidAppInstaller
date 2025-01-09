@@ -1,6 +1,8 @@
 package com.jero3000.appinstaller.ui.screen.setup
 
 import androidappinstaller.composeapp.generated.resources.Res
+import androidappinstaller.composeapp.generated.resources.setup_adb_server_timeout
+import androidappinstaller.composeapp.generated.resources.setup_adb_server_timeout_message
 import androidappinstaller.composeapp.generated.resources.setup_app_packages
 import androidappinstaller.composeapp.generated.resources.setup_config_required
 import androidappinstaller.composeapp.generated.resources.setup_device
@@ -267,6 +269,14 @@ class SetupScreen: Screen {
                         buttonText = stringResource(Res.string.setup_settings_button), {}) {
                         viewModel.onEvent(SetupEvent.OnErrorAck)
                         navigator.push(SettingsScreen())
+                    }
+                }
+
+                SetupState.Error.AdbServerTimeout -> {
+                    CustomAlertDialog(title = stringResource(Res.string.setup_adb_server_timeout),
+                        text = stringResource(Res.string.setup_adb_server_timeout_message),
+                        "Ok", {}) {
+                        viewModel.onEvent(SetupEvent.OnErrorAck)
                     }
                 }
             }

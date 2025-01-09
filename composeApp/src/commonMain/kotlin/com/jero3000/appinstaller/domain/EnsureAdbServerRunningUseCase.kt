@@ -18,7 +18,6 @@ class EnsureAdbServerRunningUseCase(
             val binaryResult = adbRepository.getBinary()
             binaryResult.getOrNull()?.let { binary ->
                 adbBinary.startServer(binary, port)
-                Result.success(Unit)
             } ?: Result.failure(binaryResult.exceptionOrNull() ?: Exception("Unknown error"))
         } else {
             Result.success(Unit)

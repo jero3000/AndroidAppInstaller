@@ -33,6 +33,8 @@
     <string name="setup_install_message2">herramienta ADB</string>
     <string name="setup_install_message3"> o configura la ruta correcta en los ajustes</string>
     <string name="setup_no_adb_message">Android Debug Bridge (adb) ejecutable no encontrado</string>
+    <string name="setup_adb_server_timeout">El servidor adb (Android Debug Bridge) no responde</string>
+    <string name="setup_adb_server_timeout_message">Intenta relanzar el servidor adb manualmente desde línea de comandos: adb kill-server &amp;&amp; adb start-server</string>
     <string name="setup_settings_button">Ir a ajustes</string>
     <string name="setup_package_idle">Inactivo</string>
     <string name="setup_package_downloading">Descargando...</string>
