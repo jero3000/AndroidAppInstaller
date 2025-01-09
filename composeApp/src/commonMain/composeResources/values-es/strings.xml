@@ -19,7 +19,7 @@
     <string name="menu_bar_help_about">Sobre la apliación</string>
     <string name="menu_bar_help_about_mnemonic">S</string>
     <string name="about_version">Versión: </string>
-    <string name="setup_config_required">No existen datos de configuración. Por favor, carga un fichero de configuración: Archivo > Cargar configuración...</string>
+    <string name="setup_config_required">No existen datos de configuración. Arrastra y suelta un fichero de configuración aquí, o cárgalo usando el menú: Archivo > Cargar configuración...</string>
     <string name="setup_project">Proyecto</string>
     <string name="setup_not_set">No configurado</string>
     <string name="setup_target">Variante</string>

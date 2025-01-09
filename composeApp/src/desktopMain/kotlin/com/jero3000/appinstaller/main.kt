@@ -18,8 +18,11 @@ import androidappinstaller.composeapp.generated.resources.menu_bar_help_language
 import androidappinstaller.composeapp.generated.resources.menu_bar_help_licenses
 import androidappinstaller.composeapp.generated.resources.menu_bar_help_licenses_mnemonic
 import androidappinstaller.composeapp.generated.resources.menu_bar_help_mnemonic
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +37,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.awtTransferable
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyShortcut
 import androidx.compose.ui.platform.LocalUriHandler
@@ -69,7 +76,10 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.inject
+import java.awt.datatransfer.DataFlavor
+import java.io.File
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 fun main() {
     startKoin {
         modules(appModule)
@@ -120,7 +130,42 @@ fun main() {
                             }
                         )
                         MaterialTheme {
-                            CurrentScreen()
+                            var showTargetBorder by remember { mutableStateOf(false) }
+                            val dragAndDropTarget = remember {
+                                object: DragAndDropTarget {
+
+                                    // Highlights the border of a potential drop target
+                                    override fun onStarted(event: DragAndDropEvent) {
+                                        showTargetBorder = true
+                                    }
+
+                                    override fun onEnded(event: DragAndDropEvent) {
+                                        showTargetBorder = false
+                                    }
+
+                                    override fun onDrop(event: DragAndDropEvent): Boolean {
+                                        var result = false
+                                        event.awtTransferable.let {
+                                            if (it.isDataFlavorSupported(DataFlavor.javaFileListFlavor)) {
+                                                @Suppress("UNCHECKED_CAST")
+                                                val files = it.getTransferData(DataFlavor.javaFileListFlavor) as List<File>
+                                                files.firstOrNull()?.path?.let { path ->
+                                                    MenuActions.loadConfiguration(path)
+                                                }
+                                                result = true
+                                            }
+                                        }
+
+                                        return result
+                                    }
+                                }
+                            }
+                            Box (modifier = Modifier.dragAndDropTarget(
+                                shouldStartDragAndDrop = { true },
+                                target = dragAndDropTarget
+                            )){
+                                CurrentScreen()
+                            }
                         }
                     }
 

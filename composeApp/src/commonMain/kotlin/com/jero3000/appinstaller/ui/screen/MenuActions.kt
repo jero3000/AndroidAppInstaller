@@ -23,4 +23,9 @@ object MenuActions : KoinComponent{
             }
         }
     }
+
+    fun loadConfiguration(path: String){
+        val loadFile : LoadAppConfigUseCase by inject()
+        loadFile(path)
+    }
 }

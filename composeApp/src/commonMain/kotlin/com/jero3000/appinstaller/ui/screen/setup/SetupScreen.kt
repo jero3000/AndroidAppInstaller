@@ -1,6 +1,7 @@
 package com.jero3000.appinstaller.ui.screen.setup
 
 import androidappinstaller.composeapp.generated.resources.Res
+import androidappinstaller.composeapp.generated.resources.installer_icon
 import androidappinstaller.composeapp.generated.resources.setup_adb_server_timeout
 import androidappinstaller.composeapp.generated.resources.setup_adb_server_timeout_message
 import androidappinstaller.composeapp.generated.resources.setup_app_packages
@@ -24,6 +25,7 @@ import androidappinstaller.composeapp.generated.resources.setup_package_installi
 import androidappinstaller.composeapp.generated.resources.setup_project
 import androidappinstaller.composeapp.generated.resources.setup_settings_button
 import androidappinstaller.composeapp.generated.resources.setup_target
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +33,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -50,6 +53,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -74,6 +78,7 @@ import com.jero3000.appinstaller.ui.screen.setup.model.SetupEvent
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupPackage
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupState
 import com.jero3000.appinstaller.ui.theme.CustomTheme
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -103,10 +108,17 @@ class SetupScreen: Screen {
                     verticalArrangement = Arrangement.Center
 
                 ) {
+                    Image(
+                        modifier = Modifier.size(256.dp),
+                        painter = painterResource(Res.drawable.installer_icon),
+                        contentDescription = null
+                    )
                     Text(
+                        modifier = Modifier.padding(top = 40.dp),
                         text = stringResource(Res.string.setup_config_required),
                         textAlign = TextAlign.Center,
-                        fontSize = 24.sp
+                        fontSize = 24.sp,
+                        style = TextStyle( lineHeight = 30.sp )
                     )
                 }
             } else {
