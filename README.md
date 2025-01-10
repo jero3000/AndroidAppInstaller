@@ -77,6 +77,9 @@ The configuration file is structured as follows:
                      "name":"Main application",
                      "packageName":"com.jero3000.application.ot.mainapp",
                      "path":"operatorTier/{device}/R{major}.{minor}.{micro}_{build}/mainapp-operator-release_{device}{major}.{minor}.{micro}.{build}.apk"
+                     "altPath":{
+                        "man1": "operatorTier/{device:uppercase}/R{major}.{minor}.{micro}_{build}/mainapp-operator-release_{device}{major}.{minor}.{micro}.{build}.apk"
+                     }
                   },
                   ...
                ]
@@ -100,6 +103,7 @@ Each application package declares:
 - **name**: the name of the application
 - **packageName**: the Android package name of the application
 - **path**: the path where the application package is located in the server
+- **altPath** (optional): defines a mapping for alternative package locations based on the device manufacturer (key)
 
 #### Placeholders
 
@@ -112,8 +116,6 @@ name between brackets, example:
 "path": "mainapp-operator-release_{device}{major}.{minor}.{micro}.{build}.apk"
 ```
 
-
-
 The placeholders supported are:
 
 - **major**: based on the major input text field
@@ -122,4 +124,13 @@ The placeholders supported are:
 - **build**: based on the build input text field
 - **device**: based on the "ro.product.manufacturer" device property. If **deviceMap** was configured, then the property value is mapped to the related value
 
+Some modifiers are also available  when a specific placeholder is applied, these are:
+- **lowercase**: transforms the resulting string in lower case
+- **uppercase**: transforms the resulting string in upper case
+- **camelcase**: transforms the resulting string in camel case
 
+You can use the modifiers as follows:
+
+```
+"path": "mainapp-operator-release_{device:camelcase}.apk"
+```
