@@ -54,6 +54,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberDialogState
+import androidx.compose.ui.window.rememberWindowState
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.jetpack.ProvideNavigatorLifecycleKMPSupport
 import cafe.adriel.voyager.navigator.CurrentScreen
@@ -104,6 +105,7 @@ fun main() {
             LocalizedApp(locale = currentLocale) {
                 Window(
                     onCloseRequest = { exitPopup = true },
+                    state = rememberWindowState(size = DpSize(800.dp, 630.dp)),
                     title = "Android application installer",
                     icon = painterResource(Res.drawable.installer_icon)
                 ) {
