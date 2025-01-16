@@ -74,12 +74,12 @@ compose.desktop {
             configurationFiles.from("proguard-rules.pro")
             obfuscate.set(false)
             isEnabled.set(true)
-            optimize.set(true)
+            optimize.set(false)
             version.set("7.6.0")
         }
 
         mainClass = "com.jero3000.appinstaller.MainKt"
-        val appVersion = "1.1.0"
+        val appVersion = "1.1.1"
         jvmArgs += listOf("-DversionName=$appVersion")
         nativeDistributions {
             linux {
