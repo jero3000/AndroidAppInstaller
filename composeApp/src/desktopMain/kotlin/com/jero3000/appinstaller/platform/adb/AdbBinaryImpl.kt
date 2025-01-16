@@ -87,7 +87,7 @@ class AdbBinaryImpl(private val ioContext: CoroutineContext) : AdbBinary{
             val process = ProcessBuilder(adbBinary.getAbsolutePath(), "-P", adbServerPort.toString(), "start-server")
              .redirectErrorStream(true)
              .start()
-            val exited = process.waitFor(250, TimeUnit.MILLISECONDS)
+            val exited = process.waitFor(2, TimeUnit.SECONDS)
             if(exited){
                 if (process.exitValue() != 0) {
                     val output = process.inputStream.bufferedReader().readText()
