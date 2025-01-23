@@ -61,7 +61,7 @@ class JadbDevice(private val jadb: JadbDevice, private val ioContext: CoroutineC
     }
 
     companion object{
-        private const val INSTALL_TIMEOUT_MS = 20000L
+        private const val INSTALL_TIMEOUT_MS = 30000L
         private const val GETPROP_TIMEOUT_MS = 5000L
     }
 }
