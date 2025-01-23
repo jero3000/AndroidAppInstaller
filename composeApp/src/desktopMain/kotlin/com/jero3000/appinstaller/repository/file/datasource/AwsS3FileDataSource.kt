@@ -2,6 +2,7 @@ package com.jero3000.appinstaller.repository.file.datasource
 
 import aws.sdk.kotlin.services.s3.S3Client
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
+import aws.sdk.kotlin.services.s3.model.NoSuchKey
 import aws.smithy.kotlin.runtime.content.writeToOutputStream
 import com.jero3000.appinstaller.model.Credential
 import dev.zwander.kotlin.file.FileUtils
@@ -43,12 +44,16 @@ class AwsS3FileDataSource : FileDataSource {
             S3Client {
                 region = regionStr
             }.use { s3 ->
-                s3.getObject(request) { response ->
-                    response.body?.let { stream ->
-                        FileOutputStream(targetFilePath).use {
-                            stream.writeToOutputStream(it)
-                        }
-                    } ?: throw IOException("Unable to download the file")
+                try {
+                    s3.getObject(request) { response ->
+                        response.body?.let { stream ->
+                            FileOutputStream(targetFilePath).use {
+                                stream.writeToOutputStream(it)
+                            }
+                        } ?: throw IOException("Unable to download the file")
+                    }
+                }catch (e: NoSuchKey){
+                    throw (Exception("File not found at AWS S3 server: $keyStr", e))
                 }
             }
             val fileUri = Paths.get(targetFilePath).toUri().toString()
