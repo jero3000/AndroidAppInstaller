@@ -176,6 +176,7 @@ class SetupScreen: Screen {
                                     && uiState.selectedTarget != null
                                     && versionState.versionValid
                                     && uiState.selectedDevice != null
+                                    && uiState.packages.any { it.selected }
                         ) {
                             Text(stringResource(Res.string.setup_download_button))
                         }
@@ -183,8 +184,9 @@ class SetupScreen: Screen {
                             modifier = Modifier.padding(start = 10.dp),
                             colors = ButtonDefaults.buttonColors(),
                             onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
-                            enabled = uiState.selectedDevice != null && uiState.packages.filter { it.selected }
-                                .all { it.state == SetupPackage.State.Downloaded }
+                            enabled = uiState.selectedDevice != null
+                                    && uiState.packages.filter { it.selected }.all { it.state == SetupPackage.State.Downloaded }
+                                    && uiState.packages.any { it.selected }
                         ) {
                             Text(stringResource(Res.string.setup_install_button))
                         }
