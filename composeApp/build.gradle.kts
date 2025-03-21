@@ -79,7 +79,7 @@ compose.desktop {
         }
 
         mainClass = "com.jero3000.appinstaller.MainKt"
-        val appVersion = "1.1.2"
+        val appVersion = "1.1.3"
         jvmArgs += listOf("-DversionName=$appVersion")
         nativeDistributions {
             linux {

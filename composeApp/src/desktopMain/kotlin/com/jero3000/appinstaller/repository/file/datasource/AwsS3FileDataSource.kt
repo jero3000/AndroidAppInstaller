@@ -30,12 +30,13 @@ class AwsS3FileDataSource : FileDataSource {
             val paths = Paths.get(uri.path)
             val bucketStr = paths.first().toString()
             val keyList = paths.toList().takeLast(paths.count() - 1).map { it.toString() }
-            val keyStr = Paths.get("", *keyList.toTypedArray()).toString()
+            val keyStr = Paths.get("", *keyList.toTypedArray()).toString().replace("\\", "/")
             val filename = Path(uri.path).name
             val targetFilePath =
                 targetPath.takeIf { it.endsWith(File.separator) }?.let { it + filename }
                     ?: (targetPath + File.separator + filename)
             println("Downloading from region: $regionStr bucket: $bucketStr key: $keyStr")
+            println("Target file path: $targetFilePath")
 
             val request = GetObjectRequest {
                 bucket = bucketStr
