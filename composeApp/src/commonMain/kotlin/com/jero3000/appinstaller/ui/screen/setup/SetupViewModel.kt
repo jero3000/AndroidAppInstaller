@@ -60,7 +60,10 @@ class SetupViewModel(
             getAppConfigFlow().collect{ appConfigResult ->
                 appConfigResult.getOrNull()?.let { appConfig ->
                     _uiState.update { _ ->
-                        SetupState(projects = appConfig.projects.map { it.name })
+                        SetupState(
+                            projects = appConfig.projects.map { it.name },
+                            devices = appConfig.devices
+                        )
                     }
                     readPreferences()
                     val adbError = ensureAdbServerRunning().exceptionOrNull()?.let {
@@ -94,7 +97,8 @@ class SetupViewModel(
                     }
 
                     discoverDevices().collect{ devices ->
-                        _uiState.update { it.copy(devices = devices) }
+                        val hardcodedDevices = getAppConfig()?.devices ?: emptyList()
+                        _uiState.update { it.copy(devices = devices + hardcodedDevices) }
                     }
                 }
             }

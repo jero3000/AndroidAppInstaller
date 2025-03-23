@@ -1,5 +1,6 @@
 package com.jero3000.appinstaller.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material3.Text
 import androidx.compose.material3.DropdownMenuItem
@@ -16,17 +17,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
+data class DropDownItem(val header: Boolean, val name: String)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DropDownRow(modifier: Modifier = Modifier,
-                label : String,
-                options: List<String>,
-                default: String,
-                onSelected: (option: String) -> Unit){
+                   label : String,
+                   options: List<DropDownItem>,
+                   default: String,
+                   onSelected: (option: String) -> Unit){
     Row (modifier) {
         var expanded by remember { mutableStateOf(false) }
-        var text by remember { mutableStateOf(default) }
-        text = default
+        var text by remember(default) { mutableStateOf(default) }
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = it },
@@ -50,15 +52,26 @@ fun DropDownRow(modifier: Modifier = Modifier,
                 onDismissRequest = { expanded = false },
             ) {
                 options.forEach { option ->
-                    DropdownMenuItem(
-                        text = { Text(option, style = MaterialTheme.typography.labelMedium) },
-                        onClick = {
-                            text = option
-                            onSelected(option)
-                            expanded = false
-                        },
-                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                    )
+                    if(option.header){
+                        DropdownMenuItem(
+                            modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                            text = { Text("Hardcoded devices") },
+                            onClick = {},
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            enabled = false
+
+                        )
+                    } else {
+                        DropdownMenuItem(
+                            text = { Text(option.name, style = MaterialTheme.typography.labelMedium) },
+                            onClick = {
+                                text = option.name
+                                onSelected(option.name)
+                                expanded = false
+                            },
+                            contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                        )
+                    }
                 }
             }
         }

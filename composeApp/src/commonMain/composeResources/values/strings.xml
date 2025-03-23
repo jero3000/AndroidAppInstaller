@@ -42,6 +42,7 @@
     <string name="setup_package_installing">Installing...</string>
     <string name="setup_package_installed">Installed</string>
     <string name="setup_package_error">Error</string>
+    <string name="setup_hardcoded_devices_header">Hardcoded devices</string>
     <string name="settings_back_button">back</string>
     <string name="settings_adb_binary">Adb binary</string>
     <string name="settings_adb_binary_picker_title">Select the Adb binary executable</string>

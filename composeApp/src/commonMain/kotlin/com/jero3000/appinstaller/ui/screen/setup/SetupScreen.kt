@@ -9,6 +9,7 @@ import androidappinstaller.composeapp.generated.resources.setup_config_required
 import androidappinstaller.composeapp.generated.resources.setup_device
 import androidappinstaller.composeapp.generated.resources.setup_download_button
 import androidappinstaller.composeapp.generated.resources.setup_error_dialog_title
+import androidappinstaller.composeapp.generated.resources.setup_hardcoded_devices_header
 import androidappinstaller.composeapp.generated.resources.setup_install_button
 import androidappinstaller.composeapp.generated.resources.setup_install_message1
 import androidappinstaller.composeapp.generated.resources.setup_install_message2
@@ -70,6 +71,7 @@ import com.jero3000.appinstaller.model.Credential
 import com.jero3000.appinstaller.ui.component.AppRow
 import com.jero3000.appinstaller.ui.component.CredentialsDialog
 import com.jero3000.appinstaller.ui.component.CustomAlertDialog
+import com.jero3000.appinstaller.ui.component.DropDownItem
 import com.jero3000.appinstaller.ui.component.DropDownRow
 import com.jero3000.appinstaller.ui.component.VersionRow
 import com.jero3000.appinstaller.ui.component.rememberVersionState
@@ -130,12 +132,12 @@ class SetupScreen: Screen {
                         DropDownRow(
                             modifier = Modifier.padding(end = 10.dp),
                             label = stringResource(Res.string.setup_project),
-                            options = uiState.projects,
+                            options = uiState.projects.map { DropDownItem(false, it) },
                             default = uiState.selectedProject ?: stringResource(Res.string.setup_not_set)
                         ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
                         DropDownRow(
                             label = stringResource(Res.string.setup_target),
-                            options = uiState.targets,
+                            options = uiState.targets.map { DropDownItem(false, it) },
                             default = uiState.selectedTarget ?: stringResource(Res.string.setup_not_set)
                         ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
                     }
@@ -157,10 +159,15 @@ class SetupScreen: Screen {
                         ))
                     }
 
+                    val realDevices = uiState.devices.filter { !it.isHardcoded }.map { DropDownItem(false, it.label) }
+                    val hardcodedDevices = uiState.devices.filter { it.isHardcoded }.map { DropDownItem(false, it.label) }
+                    val deviceItems = realDevices +
+                            DropDownItem(true, stringResource(Res.string.setup_hardcoded_devices_header)) +
+                            hardcodedDevices
                     DropDownRow(
                         modifier = Modifier.padding(top = 20.dp),
                         label = stringResource(Res.string.setup_device),
-                        options = uiState.devices.map { it.label },
+                        options = deviceItems,
                         default = uiState.selectedDevice?.label ?: stringResource(Res.string.setup_not_set)
                     ) { labelSelected ->
                         uiState.devices.firstOrNull { it.label == labelSelected }?.let {
@@ -185,6 +192,7 @@ class SetupScreen: Screen {
                             colors = ButtonDefaults.buttonColors(),
                             onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
                             enabled = uiState.selectedDevice != null
+                                    && !uiState.selectedDevice!!.isHardcoded
                                     && uiState.packages.filter { it.selected }.all { it.state == SetupPackage.State.Downloaded }
                                     && uiState.packages.any { it.selected }
                         ) {

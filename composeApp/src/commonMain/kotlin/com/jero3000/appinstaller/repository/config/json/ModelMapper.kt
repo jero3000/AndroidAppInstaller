@@ -1,5 +1,6 @@
 package com.jero3000.appinstaller.repository.config.json
 
+import com.jero3000.appinstaller.model.AndroidDevice
 import com.jero3000.appinstaller.model.AppConfig
 import com.jero3000.appinstaller.model.AppPackage
 import com.jero3000.appinstaller.model.BuildVariant
@@ -24,6 +25,14 @@ fun ProjectDto.toProject() = Project(
     buildVariants.map { it.toBuildVariant() }
 )
 
+fun DeviceDto.toAndroidDevice() = AndroidDevice(
+    "",
+    manufacturer,
+    manufacturer,
+    true
+)
+
 fun AppConfigDto.toAppConfig() = AppConfig(
+    devices.map { it.toAndroidDevice() },
     projects.map { it.toProject() }
 )
