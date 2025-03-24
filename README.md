@@ -134,3 +134,26 @@ You can use the modifiers as follows:
 ```
 "path": "mainapp-operator-release_{device:camelcase}.apk"
 ```
+
+#### Hardcoded devices support
+
+Sometimes, instead of installing application packages, you may only need to download them. In such 
+cases, you can define a set of predefined or hardcoded devices directly in the configuration JSON 
+file, as shown below:
+
+```
+{
+   "devices":[
+      {
+         "manufacturer": "Manufacturer1"
+      },
+      {
+         "manufacturer": "Manufacturer2"
+      }
+   ],
+   "projects":[
+   ...
+   ]
+}
+```
+
