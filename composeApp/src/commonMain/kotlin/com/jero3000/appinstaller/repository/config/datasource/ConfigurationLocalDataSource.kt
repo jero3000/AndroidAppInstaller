@@ -18,6 +18,9 @@ class ConfigurationLocalDataSource(private val ioContext: CoroutineContext,
                                    private val fileUtils: FileUtils
 ) :
     ConfigurationDataSource {
+
+    private val json = Json{ ignoreUnknownKeys = true }
+
     override suspend fun getConfiguration(): Result<AppConfig> {
         val appDataDirectory = platformFileSystem.getAppDataDirectory("AndroidAppInstaller", "jero3000")
         val filePath = platformFileSystem.combine(appDataDirectory, CONFIG_FILE_NAME)
@@ -39,7 +42,7 @@ class ConfigurationLocalDataSource(private val ioContext: CoroutineContext,
         }
         val result = jsonResult.getOrNull()?.let{
             runCatching {
-                Json.decodeFromString<AppConfigDto>(it).toAppConfig()
+                json.decodeFromString<AppConfigDto>(it).toAppConfig()
             }
         } ?: Result.failure(jsonResult.exceptionOrNull() ?: Exception("Unknown error parsing the JSON file"))
         if(result.isSuccess && copyToAppData){
