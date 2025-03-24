@@ -42,6 +42,7 @@
     <string name="setup_package_installing">Instalando...</string>
     <string name="setup_package_installed">Instalado</string>
     <string name="setup_package_error">Error</string>
+    <string name="setup_real_devices_header">Dispositivos conectados</string>
     <string name="setup_hardcoded_devices_header">Dispositivos offline</string>
     <string name="settings_back_button">atrás</string>
     <string name="settings_adb_binary">Adb ejecutable</string>

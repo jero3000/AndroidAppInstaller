@@ -11,12 +11,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 
+@Immutable
 data class DropDownItem(val header: Boolean, val name: String)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +59,13 @@ fun DropDownRow(modifier: Modifier = Modifier,
                     if(option.header){
                         DropdownMenuItem(
                             modifier = Modifier.background(MaterialTheme.colorScheme.background),
-                            text = { Text("Hardcoded devices") },
+                            text = {
+                                Text(
+                                    option.name,
+                                    fontWeight = FontWeight.Bold,
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
                             onClick = {},
                             contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                             enabled = false

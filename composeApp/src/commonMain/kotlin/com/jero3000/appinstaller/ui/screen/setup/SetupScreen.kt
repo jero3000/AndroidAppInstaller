@@ -24,6 +24,7 @@ import androidappinstaller.composeapp.generated.resources.setup_package_idle
 import androidappinstaller.composeapp.generated.resources.setup_package_installed
 import androidappinstaller.composeapp.generated.resources.setup_package_installing
 import androidappinstaller.composeapp.generated.resources.setup_project
+import androidappinstaller.composeapp.generated.resources.setup_real_devices_header
 import androidappinstaller.composeapp.generated.resources.setup_settings_button
 import androidappinstaller.composeapp.generated.resources.setup_target
 import androidx.compose.foundation.Image
@@ -47,6 +48,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -159,11 +162,26 @@ class SetupScreen: Screen {
                         ))
                     }
 
-                    val realDevices = uiState.devices.filter { !it.isHardcoded }.map { DropDownItem(false, it.label) }
-                    val hardcodedDevices = uiState.devices.filter { it.isHardcoded }.map { DropDownItem(false, it.label) }
-                    val deviceItems = realDevices +
-                            DropDownItem(true, stringResource(Res.string.setup_hardcoded_devices_header)) +
-                            hardcodedDevices
+                    val realDeviceString = stringResource(Res.string.setup_real_devices_header)
+                    val hardcodedDeviceString = stringResource(Res.string.setup_hardcoded_devices_header)
+                    val deviceItems by remember(uiState.devices) {
+                        val realDevices = uiState.devices.filter { !it.isHardcoded }.map { DropDownItem(false, it.label) }
+                        val hardcodedDevices = uiState.devices.filter { it.isHardcoded }.map { DropDownItem(false, it.label) }
+                        val realDevicesHeader = if(realDevices.isNotEmpty()) {
+                            listOf(DropDownItem(true, realDeviceString))
+                        } else {
+                            emptyList()
+                        }
+                        val hardcodedDevicesHeader = if(hardcodedDevices.isNotEmpty()){
+                            listOf(DropDownItem(true, hardcodedDeviceString))
+                        } else {
+                            emptyList()
+                        }
+                        val items = realDevicesHeader + realDevices +
+                                hardcodedDevicesHeader + hardcodedDevices
+                        mutableStateOf(items)
+                    }
+
                     DropDownRow(
                         modifier = Modifier.padding(top = 20.dp),
                         label = stringResource(Res.string.setup_device),
