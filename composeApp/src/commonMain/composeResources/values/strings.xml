@@ -36,6 +36,7 @@
     <string name="setup_adb_server_timeout">Android Debug Bridge (adb) server unresponsive</string>
     <string name="setup_adb_server_timeout_message">Try to re-start the server manually from command-line: adb kill-server &amp;&amp; adb start-server</string>
     <string name="setup_settings_button">Go to settings</string>
+    <string name="setup_placeholders">Options</string>
     <string name="setup_package_idle">Idle</string>
     <string name="setup_package_downloading">Downloading...</string>
     <string name="setup_package_downloaded">Downloaded</string>

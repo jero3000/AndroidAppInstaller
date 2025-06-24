@@ -36,6 +36,7 @@
     <string name="setup_adb_server_timeout">El servidor adb (Android Debug Bridge) no responde</string>
     <string name="setup_adb_server_timeout_message">Intenta relanzar el servidor adb manualmente desde línea de comandos: adb kill-server &amp;&amp; adb start-server</string>
     <string name="setup_settings_button">Ir a ajustes</string>
+    <string name="setup_placeholders">Opciones</string>
     <string name="setup_package_idle">Inactivo</string>
     <string name="setup_package_downloading">Descargando...</string>
     <string name="setup_package_downloaded">Descargado</string>

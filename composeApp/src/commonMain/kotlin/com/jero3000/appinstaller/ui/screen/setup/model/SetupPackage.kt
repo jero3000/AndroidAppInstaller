@@ -1,5 +1,8 @@
 package com.jero3000.appinstaller.ui.screen.setup.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SetupPackage(
     val name: String,
     val packageName: String,

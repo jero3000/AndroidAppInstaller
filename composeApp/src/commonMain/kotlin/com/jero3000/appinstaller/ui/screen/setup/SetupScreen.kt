@@ -23,12 +23,13 @@ import androidappinstaller.composeapp.generated.resources.setup_package_error
 import androidappinstaller.composeapp.generated.resources.setup_package_idle
 import androidappinstaller.composeapp.generated.resources.setup_package_installed
 import androidappinstaller.composeapp.generated.resources.setup_package_installing
+import androidappinstaller.composeapp.generated.resources.setup_placeholders
 import androidappinstaller.composeapp.generated.resources.setup_project
 import androidappinstaller.composeapp.generated.resources.setup_real_devices_header
 import androidappinstaller.composeapp.generated.resources.setup_settings_button
 import androidappinstaller.composeapp.generated.resources.setup_target
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -37,13 +38,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -52,8 +52,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
@@ -76,11 +74,13 @@ import com.jero3000.appinstaller.ui.component.CredentialsDialog
 import com.jero3000.appinstaller.ui.component.CustomAlertDialog
 import com.jero3000.appinstaller.ui.component.DropDownItem
 import com.jero3000.appinstaller.ui.component.DropDownRow
+import com.jero3000.appinstaller.ui.component.SwitchRow
 import com.jero3000.appinstaller.ui.component.VersionRow
 import com.jero3000.appinstaller.ui.component.rememberVersionState
 import com.jero3000.appinstaller.ui.screen.settings.SettingsScreen
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupEvent
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupPackage
+import com.jero3000.appinstaller.ui.screen.setup.model.SetupPlaceholder
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupState
 import com.jero3000.appinstaller.ui.theme.CustomTheme
 import org.jetbrains.compose.resources.painterResource
@@ -107,160 +107,12 @@ class SetupScreen: Screen {
             }
 
             if (uiState.projects.isEmpty()) {
-                Column(
-                    modifier = Modifier.padding(20.dp).fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-
-                ) {
-                    Image(
-                        modifier = Modifier.size(256.dp),
-                        painter = painterResource(Res.drawable.installer_icon),
-                        contentDescription = null
-                    )
-                    Text(
-                        modifier = Modifier.padding(top = 40.dp),
-                        text = stringResource(Res.string.setup_config_required),
-                        textAlign = TextAlign.Center,
-                        fontSize = 24.sp,
-                        style = TextStyle( lineHeight = 30.sp )
-                    )
-                }
+                Splash(modifier = Modifier.padding(20.dp).fillMaxSize())
             } else {
-                Column(
-                    modifier = Modifier.padding(20.dp).fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row {
-                        DropDownRow(
-                            modifier = Modifier.padding(end = 10.dp),
-                            label = stringResource(Res.string.setup_project),
-                            options = uiState.projects.map { DropDownItem(false, it) },
-                            default = uiState.selectedProject ?: stringResource(Res.string.setup_not_set)
-                        ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
-                        DropDownRow(
-                            label = stringResource(Res.string.setup_target),
-                            options = uiState.targets.map { DropDownItem(false, it) },
-                            default = uiState.selectedTarget ?: stringResource(Res.string.setup_not_set)
-                        ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
-                    }
-
-                    val versionState = rememberVersionState(
-                        uiState.selectedVersion?.major ?: "",
-                        uiState.selectedVersion?.minor ?: "",
-                        uiState.selectedVersion?.micro ?: "",
-                        uiState.selectedVersion?.build ?: ""
-                    )
-                    VersionRow(modifier = Modifier.padding(top = 20.dp), versionState) {
-                        viewModel.onEvent(SetupEvent.OnVersionEntered(
-                            AppVersion(
-                                versionState.major,
-                                versionState.minor,
-                                versionState.micro,
-                                versionState.build.takeIf { it.isNotBlank() }
-                            )
-                        ))
-                    }
-
-                    val realDeviceString = stringResource(Res.string.setup_real_devices_header)
-                    val hardcodedDeviceString = stringResource(Res.string.setup_hardcoded_devices_header)
-                    val deviceItems by remember(uiState.devices) {
-                        val realDevices = uiState.devices.filter { !it.isHardcoded }.map { DropDownItem(false, it.label) }
-                        val hardcodedDevices = uiState.devices.filter { it.isHardcoded }.map { DropDownItem(false, it.label) }
-                        val realDevicesHeader = if(realDevices.isNotEmpty()) {
-                            listOf(DropDownItem(true, realDeviceString))
-                        } else {
-                            emptyList()
-                        }
-                        val hardcodedDevicesHeader = if(hardcodedDevices.isNotEmpty()){
-                            listOf(DropDownItem(true, hardcodedDeviceString))
-                        } else {
-                            emptyList()
-                        }
-                        val items = realDevicesHeader + realDevices +
-                                hardcodedDevicesHeader + hardcodedDevices
-                        mutableStateOf(items)
-                    }
-
-                    DropDownRow(
-                        modifier = Modifier.padding(top = 20.dp),
-                        label = stringResource(Res.string.setup_device),
-                        options = deviceItems,
-                        default = uiState.selectedDevice?.label ?: stringResource(Res.string.setup_not_set)
-                    ) { labelSelected ->
-                        uiState.devices.firstOrNull { it.label == labelSelected }?.let {
-                            viewModel.onEvent(SetupEvent.OnDeviceSelected(it))
-                        }
-                    }
-
-                    Row(modifier = Modifier.padding(top = 20.dp, bottom = 14.dp)) {
-                        Button(
-                            colors = ButtonDefaults.buttonColors(),
-                            onClick = { viewModel.onEvent(SetupEvent.OnDownloadClicked) },
-                            enabled = uiState.selectedProject != null
-                                    && uiState.selectedTarget != null
-                                    && versionState.versionValid
-                                    && uiState.selectedDevice != null
-                                    && uiState.packages.any { it.selected }
-                        ) {
-                            Text(stringResource(Res.string.setup_download_button))
-                        }
-                        Button(
-                            modifier = Modifier.padding(start = 10.dp),
-                            colors = ButtonDefaults.buttonColors(),
-                            onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
-                            enabled = uiState.selectedDevice != null
-                                    && !uiState.selectedDevice!!.isHardcoded
-                                    && uiState.packages.filter { it.selected }.all { it.state == SetupPackage.State.Downloaded }
-                                    && uiState.packages.any { it.selected }
-                        ) {
-                            Text(stringResource(Res.string.setup_install_button))
-                        }
-                    }
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(5.dp))
-                            .background(Color.LightGray)
-                            .padding(6.dp),
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = stringResource(Res.string.setup_app_packages),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-                    }
-                    if (uiState.selectedProject != null && uiState.selectedTarget != null) {
-                        LazyColumn(
-                            modifier = Modifier.wrapContentSize().padding(top = 10.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            content = {
-                                items(uiState.packages) { appPackage ->
-                                    AppRow(modifier = Modifier.padding(top = 10.dp).width(450.dp),
-                                        appName = appPackage.name,
-                                        color = getAppColor(appPackage.state),
-                                        checked = appPackage.selected,
-                                        state = getAppState(appPackage.state),
-                                        isTransient = isTransientState(appPackage.state),
-                                        onCheckedChanged = { checked ->
-                                            viewModel.onEvent(
-                                                SetupEvent.OnSetupPackageChanged(
-                                                    appPackage.packageName,
-                                                    checked
-                                                )
-                                            )
-                                        }
-                                    )
-                                }
-                            }
-                        )
-                    } else {
-                        Text(
-                            modifier = Modifier.padding(top = 20.dp),
-                            text = stringResource(Res.string.setup_no_packages_warning)
-                        )
-                    }
-                }
+                SetupContent(modifier = Modifier.padding(20.dp).fillMaxWidth(),
+                    viewModel,
+                    uiState
+                )
             }
         }
 
@@ -323,10 +175,226 @@ class SetupScreen: Screen {
         }
     }
 
+    @Composable
+    private fun Splash(modifier: Modifier = Modifier){
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+
+        ) {
+            Image(
+                modifier = Modifier.size(256.dp),
+                painter = painterResource(Res.drawable.installer_icon),
+                contentDescription = null
+            )
+            Text(
+                modifier = Modifier.padding(top = 40.dp),
+                text = stringResource(Res.string.setup_config_required),
+                textAlign = TextAlign.Center,
+                fontSize = 24.sp,
+                style = TextStyle( lineHeight = 30.sp )
+            )
+        }
+    }
+
+    @Composable
+    private fun SetupContent(modifier: Modifier, viewModel: SetupViewModel, uiState: SetupState){
+        Column(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Row {
+                DropDownRow(
+                    modifier = Modifier.padding(end = 10.dp),
+                    label = stringResource(Res.string.setup_project),
+                    options = uiState.projects.map { DropDownItem(false, it) },
+                    default = uiState.selectedProject ?: stringResource(Res.string.setup_not_set)
+                ) { viewModel.onEvent(SetupEvent.OnProjectSelected(it)) }
+                DropDownRow(
+                    label = stringResource(Res.string.setup_target),
+                    options = uiState.targets.map { DropDownItem(false, it) },
+                    default = uiState.selectedTarget ?: stringResource(Res.string.setup_not_set)
+                ) { viewModel.onEvent(SetupEvent.OnTargetSelected(it)) }
+            }
+
+            val versionState = rememberVersionState(
+                uiState.selectedVersion?.major ?: "",
+                uiState.selectedVersion?.minor ?: "",
+                uiState.selectedVersion?.micro ?: "",
+                uiState.selectedVersion?.build ?: ""
+            )
+            VersionRow(modifier = Modifier.padding(top = 20.dp), versionState) {
+                viewModel.onEvent(SetupEvent.OnVersionEntered(
+                    AppVersion(
+                        versionState.major,
+                        versionState.minor,
+                        versionState.micro,
+                        versionState.build.takeIf { it.isNotBlank() }
+                    )
+                ))
+            }
+
+            val realDeviceString = stringResource(Res.string.setup_real_devices_header)
+            val hardcodedDeviceString = stringResource(Res.string.setup_hardcoded_devices_header)
+            val deviceItems by remember(uiState.devices) {
+                val realDevices = uiState.devices.filter { !it.isHardcoded }.map { DropDownItem(false, it.label) }
+                val hardcodedDevices = uiState.devices.filter { it.isHardcoded }.map { DropDownItem(false, it.label) }
+                val realDevicesHeader = if(realDevices.isNotEmpty()) {
+                    listOf(DropDownItem(true, realDeviceString))
+                } else {
+                    emptyList()
+                }
+                val hardcodedDevicesHeader = if(hardcodedDevices.isNotEmpty()){
+                    listOf(DropDownItem(true, hardcodedDeviceString))
+                } else {
+                    emptyList()
+                }
+                val items = realDevicesHeader + realDevices +
+                        hardcodedDevicesHeader + hardcodedDevices
+                mutableStateOf(items)
+            }
+
+            DropDownRow(
+                modifier = Modifier.padding(top = 20.dp),
+                label = stringResource(Res.string.setup_device),
+                options = deviceItems,
+                default = uiState.selectedDevice?.label ?: stringResource(Res.string.setup_not_set)
+            ) { labelSelected ->
+                uiState.devices.firstOrNull { it.label == labelSelected }?.let {
+                    viewModel.onEvent(SetupEvent.OnDeviceSelected(it))
+                }
+            }
+
+            Row(modifier = Modifier.padding(top = 20.dp, bottom = 14.dp)) {
+                Button(
+                    colors = ButtonDefaults.buttonColors(),
+                    onClick = { viewModel.onEvent(SetupEvent.OnDownloadClicked) },
+                    enabled = uiState.selectedProject != null
+                            && uiState.selectedTarget != null
+                            && versionState.versionValid
+                            && uiState.selectedDevice != null
+                            && uiState.packages.any { it.selected }
+                ) {
+                    Text(stringResource(Res.string.setup_download_button))
+                }
+                Button(
+                    modifier = Modifier.padding(start = 10.dp),
+                    colors = ButtonDefaults.buttonColors(),
+                    onClick = { viewModel.onEvent(SetupEvent.OnInstall) },
+                    enabled = uiState.selectedDevice != null
+                            && !uiState.selectedDevice.isHardcoded
+                            && uiState.packages.filter { it.selected }.all { it.state == SetupPackage.State.Downloaded }
+                            && uiState.packages.any { it.selected }
+                ) {
+                    Text(stringResource(Res.string.setup_install_button))
+                }
+            }
+            AppPackagesHeader(modifier = Modifier.fillMaxWidth())
+            if (uiState.selectedProject != null && uiState.selectedTarget != null) {
+                Row(modifier =Modifier.padding(top = 10.dp).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly) {
+                    if (viewModel.placeholders.isNotEmpty()) {
+                        PlaceholderColumn(
+                            modifier = Modifier.size(230.dp, 170.dp),
+                            stringResource(Res.string.setup_placeholders),
+                            viewModel.placeholders
+                        ) { id, checked ->
+                          viewModel.onEvent(SetupEvent.OnPlaceholderChanged(id, checked))
+                        }
+                    }
+                    AppPackagesColumn(
+                        modifier = Modifier.width(450.dp),
+                        packages = uiState.packages
+                    ) { packageName, checked ->
+                        viewModel.onEvent(SetupEvent.OnSetupPackageChanged(packageName, checked))
+                    }
+                }
+            } else {
+                Text(
+                    modifier = Modifier.padding(top = 20.dp),
+                    text = stringResource(Res.string.setup_no_packages_warning)
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun AppPackagesHeader(modifier: Modifier = Modifier){
+        Surface(modifier,
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceDim) {
+            Row(
+                modifier = Modifier
+                    .padding(6.dp),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = stringResource(Res.string.setup_app_packages),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+            }
+        }
+    }
+
+    @Composable
+    fun PlaceholderColumn(modifier: Modifier = Modifier,
+                          title: String,
+                          placeholders: List<SetupPlaceholder>,
+                          onCheckedChanged: (String, Boolean) -> Unit){
+        Column(modifier = modifier) {
+            Text(modifier = Modifier.padding(bottom = 5.dp), text = title)
+            Surface(
+                modifier = Modifier,
+                shape = MaterialTheme.shapes.medium,
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline
+                )
+            ) {
+                LazyColumn(
+                    modifier = Modifier.padding(5.dp)
+                ) {
+                    items(placeholders, key = {it.id}) { placeholder ->
+                        SwitchRow(
+                            modifier = Modifier
+                                .fillParentMaxWidth().padding(vertical = 5.dp),
+                            name = placeholder.name,
+                            checked = placeholder.checked
+                        ) { onCheckedChanged(placeholder.id, it) }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun AppPackagesColumn(modifier : Modifier = Modifier,
+                                  packages: List<SetupPackage>,
+                                  onCheckedChanged: (String, Boolean) -> Unit){
+        LazyColumn(
+            modifier = modifier,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            content = {
+                items(packages) { appPackage ->
+                    AppRow(modifier = Modifier.fillParentMaxWidth().padding(vertical = 5.dp),
+                        appName = appPackage.name,
+                        color = getAppColor(appPackage.state),
+                        checked = appPackage.selected,
+                        state = getAppState(appPackage.state),
+                        isTransient = isTransientState(appPackage.state),
+                        onCheckedChanged = { checked ->
+                            onCheckedChanged(appPackage.packageName, checked)
+                        }
+                    )
+                }
+            }
+        )
+    }
 
     @Composable
     private fun getAppColor(state: SetupPackage.State) = when (state) {
-        SetupPackage.State.Idle -> CustomTheme.colors.idle
+        SetupPackage.State.Idle -> MaterialTheme.colorScheme.surfaceVariant
         SetupPackage.State.Downloading -> CustomTheme.colors.warning
         SetupPackage.State.Downloaded -> CustomTheme.colors.success
         SetupPackage.State.Installing -> CustomTheme.colors.warning

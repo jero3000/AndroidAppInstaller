@@ -1,5 +1,6 @@
 package com.jero3000.appinstaller.ui.screen.setup
 
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jero3000.appinstaller.domain.DiscoverDevicesUseCase
@@ -19,6 +20,7 @@ import com.jero3000.appinstaller.model.exception.CredentialsRequiredException
 import com.jero3000.appinstaller.repository.preferences.ApplicationPreferences
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupEvent
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupPackage
+import com.jero3000.appinstaller.ui.screen.setup.model.SetupPlaceholder
 import com.jero3000.appinstaller.ui.screen.setup.model.SetupState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,6 +52,9 @@ class SetupViewModel(
         started = SharingStarted.WhileSubscribed(5_000),
         initialValue = SetupState()
     )
+    private val _placeholders = SnapshotStateList<SetupPlaceholder>()
+    val placeholders : List<SetupPlaceholder>
+        get() = _placeholders
     private var scanJob : Job? = null
     private var configurationWaitCondition: Continuation<Unit>? = null
     private var configurationLoaded = false
@@ -64,6 +69,10 @@ class SetupViewModel(
                             projects = appConfig.projects.map { it.name },
                             devices = appConfig.devices
                         )
+                    }
+                    _placeholders.apply {
+                        clear()
+                        addAll(appConfig.placeholders.map { SetupPlaceholder(it.id, it.name) })
                     }
                     readPreferences()
                     val adbError = ensureAdbServerRunning().exceptionOrNull()?.let {
@@ -144,17 +153,28 @@ class SetupViewModel(
                     startDownload(it)
                 }
             }
+
+            is SetupEvent.OnPlaceholderChanged -> {
+                _placeholders.find { it.id == event.id }?.let { placeholder ->
+                    placeholder.checked = event.checked
+                }
+            }
         }
     }
 
     private suspend fun startDownload(version: AppVersion) {
-        val variant = getBuildVariant(getAppConfig())
+        val appConfig = getAppConfig()!!
+        val variant = getBuildVariant(appConfig)
         val packagesSelected = _uiState.value.packages.filter { it.selected }
         val deviceManufacturer = uiState.value.selectedDevice!!.manufacturer
 
         for(app in packagesSelected){
             val appPackage = variant.packages.first{it.packageName == app.packageName}
-            val url = resolveUrl(variant, appPackage, version, deviceManufacturer)
+            //Provide only the checked placeholders
+            val placeholders = appConfig.placeholders.filter { placeholder ->
+                _placeholders.find { it.id == placeholder.id }?.checked == true
+            }
+            val url = resolveUrl(variant, appPackage, version, deviceManufacturer, placeholders)
             updatePackage(app.packageName, SetupPackage.State.Downloading)
             val result = getPackageFile(url)
             if(result.isSuccess){
@@ -171,7 +191,7 @@ class SetupViewModel(
     }
 
     private suspend fun startInstall() {
-        val variant = getBuildVariant(getAppConfig())
+        val variant = getBuildVariant(getAppConfig()!!)
         val device = uiState.value.selectedDevice!!
         val packagesSelected = _uiState.value.packages.filter { it.selected }
         for(app in packagesSelected){
@@ -248,8 +268,8 @@ class SetupViewModel(
         }
     }
 
-    private fun getBuildVariant(appConfig: AppConfig?): BuildVariant {
-        val project = appConfig!!.projects.first{ it.name == _uiState.value.selectedProject}
+    private fun getBuildVariant(appConfig: AppConfig): BuildVariant {
+        val project = appConfig.projects.first{ it.name == _uiState.value.selectedProject}
         return project.buildVariants.first { it.name ==  _uiState.value.selectedTarget }
     }
 

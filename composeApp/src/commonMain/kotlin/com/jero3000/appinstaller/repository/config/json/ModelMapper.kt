@@ -4,6 +4,7 @@ import com.jero3000.appinstaller.model.AndroidDevice
 import com.jero3000.appinstaller.model.AppConfig
 import com.jero3000.appinstaller.model.AppPackage
 import com.jero3000.appinstaller.model.BuildVariant
+import com.jero3000.appinstaller.model.Placeholder
 import com.jero3000.appinstaller.model.Project
 
 fun AppPackageDto.toAppPackage() =  AppPackage(
@@ -32,7 +33,14 @@ fun DeviceDto.toAndroidDevice() = AndroidDevice(
     true
 )
 
+fun PlaceholderDto.toPlaceholder() = Placeholder(
+    id,
+    name,
+    value
+)
+
 fun AppConfigDto.toAppConfig() = AppConfig(
+    placeholders.map { it.toPlaceholder() },
     devices.map { it.toAndroidDevice() },
     projects.map { it.toProject() }
 )

@@ -34,7 +34,11 @@ class VersionState(major: String, minor: String, micro: String, build: String){
 }
 
 @Composable
-fun rememberVersionState(major: String, minor: String, micro: String, build: String) = remember { VersionState(major, minor, micro, build) }
+fun rememberVersionState(major: String, minor: String, micro: String, build: String) =
+    remember(major, minor, micro, build)
+    {
+        VersionState(major, minor, micro, build)
+    }
 
 @Composable
 fun rememberVersionState() = remember { VersionState("", "", "", "") }

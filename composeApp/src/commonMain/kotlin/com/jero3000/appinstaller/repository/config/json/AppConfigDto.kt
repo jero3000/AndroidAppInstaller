@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class AppConfigDto(
+    val placeholders : List<PlaceholderDto> = emptyList(),
     val devices: List<DeviceDto> = emptyList(),
     val projects: List<ProjectDto>
 )
