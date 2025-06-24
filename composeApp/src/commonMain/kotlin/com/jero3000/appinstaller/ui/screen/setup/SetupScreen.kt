@@ -296,7 +296,7 @@ class SetupScreen: Screen {
                     horizontalArrangement = Arrangement.SpaceEvenly) {
                     if (viewModel.placeholders.isNotEmpty()) {
                         PlaceholderColumn(
-                            modifier = Modifier.size(230.dp, 170.dp),
+                            modifier = Modifier.width(230.dp),
                             stringResource(Res.string.setup_placeholders),
                             viewModel.placeholders
                         ) { id, checked ->
