@@ -135,6 +135,38 @@ You can use the modifiers as follows:
 "path": "mainapp-operator-release_{device:camelcase}.apk"
 ```
 
+##### Custom placeholders
+
+Apart from the input placeholders (those ones automatically generated from the user input parameters),
+you can define custom parameters in the JSON configuration file as follows:
+
+```
+{
+   "placeholders":[
+      {
+         "id": "param1",
+         "name": "Parameter 1",
+         "value": "value1"
+      },
+      {
+         "id": "param2",
+         "name": "Parameter 2",
+         "value": "value2"
+      },
+      ...
+   ],
+   "projects":[
+   ...
+   ]
+}
+```
+
+Then you can use the custom placeholders as follows:
+
+```
+"path": "mainapp-operator-release_{param1}.apk"
+```
+
 #### Hardcoded devices support
 
 Sometimes, instead of installing application packages, you may only need to download them. In such 
@@ -149,7 +181,8 @@ file, as shown below:
       },
       {
          "manufacturer": "Manufacturer2"
-      }
+      },
+      ...
    ],
    "projects":[
    ...

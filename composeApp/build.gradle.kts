@@ -79,7 +79,7 @@ compose.desktop {
         }
 
         mainClass = "com.jero3000.appinstaller.MainKt"
-        val appVersion = "1.2.0"
+        val appVersion = "1.3.0"
         jvmArgs += listOf("-DversionName=$appVersion")
         nativeDistributions {
             linux {
@@ -97,7 +97,7 @@ compose.desktop {
             packageName = "Android App Installer"
             packageVersion = appVersion
             description = "Android Application Installer"
-            copyright = "© 2024 Jerónimo Muñoz. MIT license"
+            copyright = "© 2025 Jerónimo Muñoz. MIT license"
             licenseFile.set(project.file("../LICENSE"))
         }
     }
